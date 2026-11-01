@@ -1,3 +1,8 @@
+# ---- Shared project agent configuration & skills ----
+# 保留 .agents（含 skills/openspec-*）；下方凭据和缓存忽略规则仍生效。
+!/.agents/
+!/.agents/**
+
 # ---- Secrets & env ----
 .env
 .env.local
