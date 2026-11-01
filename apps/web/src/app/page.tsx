@@ -2,6 +2,7 @@ import { promises as fs } from "fs";
 import path from "path";
 import type { SiteIndex } from "@/types";
 import { HomeClient } from "./HomeClient";
+import { IS_LOCAL_MODE } from "@/lib/appMode";
 
 async function getIndex(): Promise<SiteIndex> {
   const p = path.join(process.cwd(), "public", "data", "index.json");
@@ -9,6 +10,8 @@ async function getIndex(): Promise<SiteIndex> {
 }
 
 export default async function HomePage() {
+  // 默认首页由根部账号入口处理，免登录年级选择仅用于显式 local 模式。
+  if (!IS_LOCAL_MODE) return null;
   const index = await getIndex();
 
   // 按年级聚合（一年级有上下册两本）

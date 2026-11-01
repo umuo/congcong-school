@@ -27,7 +27,8 @@
     "./backup": "./src/backup.ts",
     "./jump": "./src/jump.ts",
     "./storyQuiz": "./src/storyQuiz.ts",
-    "./numberSense": "./src/numberSense.ts"
+    "./numberSense": "./src/numberSense.ts",
+    "./mathSegments": "./src/mathSegments.ts"
   },
   "scripts": {
     "type-check": "tsc --noEmit",

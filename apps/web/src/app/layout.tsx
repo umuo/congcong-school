@@ -2,13 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { LEARNER_BOOT_SCRIPT } from "@/lib/learnerProfiles";
 import { Nunito } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/components/ThemeProvider";
-import { BottomNav } from "@/components/BottomNav";
-import { ToastProvider } from "@/components/Toast";
-import { DailyRewardWatcher } from "@/components/DailyRewardWatcher";
-import { AchievementWatcher } from "@/components/AchievementWatcher";
-import { IntroAudioUnlock } from "@/components/IntroAudioUnlock";
-import { LeagueWatcher } from "@/components/LeagueWatcher";
+import { RootProviders } from "@/components/RootProviders";
+import { IS_LOCAL_MODE } from "@/lib/appMode";
 
 const nunito = Nunito({
   subsets: ["latin"],
@@ -47,6 +42,8 @@ export const viewport: Viewport = {
  */
 const bootScript = `
 (function () {
+  if (!${IS_LOCAL_MODE}) return;
+  if (/^\\/(login|change-password|admin|parent|learn)(\\/|$)/.test(location.pathname)) return;
   ${LEARNER_BOOT_SCRIPT}
   try {
     var DARK_THEMES = { theme_midnight: "#0F1419", theme_obsidian: "#08090C" };
@@ -83,16 +80,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       {/* 底部导航的高度补偿由 BottomNav 自带的占位条负责（web-lesson-15）：
           课程 / 阅读器等沉浸页导航隐藏时不再留 64px 死空隙 */}
       <body className="min-h-screen bg-bg">
-        <ThemeProvider>
-          <ToastProvider>
-            <DailyRewardWatcher />
-            <AchievementWatcher />
-            <LeagueWatcher />
-            <IntroAudioUnlock />
-            {children}
-            <BottomNav />
-          </ToastProvider>
-        </ThemeProvider>
+        <RootProviders>{children}</RootProviders>
       </body>
     </html>
   );

@@ -1,0 +1,610 @@
+{
+  "version": "cstf-grading-2",
+  "cases": [
+    {
+      "id": "fill_blank-1",
+      "type": "fill_blank",
+      "answer": "1/2",
+      "input": "1/3",
+      "expected": false
+    },
+    {
+      "id": "fill_blank-2",
+      "type": "fill_blank",
+      "answer": "1/2",
+      "input": "1garbage",
+      "expected": false
+    },
+    {
+      "id": "fill_blank-3",
+      "type": "fill_blank",
+      "answer": "12",
+      "input": "12abc",
+      "expected": false
+    },
+    {
+      "id": "fill_blank-4",
+      "type": "fill_blank",
+      "answer": "1/2",
+      "input": "0.5",
+      "expected": true
+    },
+    {
+      "id": "fill_blank-5",
+      "type": "fill_blank",
+      "answer": "3/4",
+      "input": "75%",
+      "expected": true
+    },
+    {
+      "id": "fill_blank-6",
+      "type": "fill_blank",
+      "answer": "50%",
+      "input": ".5",
+      "expected": true
+    },
+    {
+      "id": "fill_blank-7",
+      "type": "fill_blank",
+      "answer": "50%",
+      "input": "50",
+      "expected": false
+    },
+    {
+      "id": "fill_blank-8",
+      "type": "fill_blank",
+      "answer": "3米",
+      "input": "3",
+      "expected": true
+    },
+    {
+      "id": "fill_blank-9",
+      "type": "fill_blank",
+      "answer": "3米",
+      "input": "3m",
+      "expected": true
+    },
+    {
+      "id": "fill_blank-10",
+      "type": "fill_blank",
+      "answer": "3米",
+      "input": "3厘米",
+      "expected": false
+    },
+    {
+      "id": "fill_blank-11",
+      "type": "fill_blank",
+      "answer": "3平方米",
+      "input": "3m²",
+      "expected": true
+    },
+    {
+      "id": "fill_blank-12",
+      "type": "fill_blank",
+      "answer": "3千克",
+      "input": "3kg",
+      "expected": true
+    },
+    {
+      "id": "fill_blank-13",
+      "type": "fill_blank",
+      "answer": "3",
+      "input": "3xyz",
+      "expected": false
+    },
+    {
+      "id": "fill_blank-14",
+      "type": "fill_blank",
+      "answer": "3",
+      "input": "3.0000009",
+      "expected": true
+    },
+    {
+      "id": "fill_blank-15",
+      "type": "fill_blank",
+      "answer": "3",
+      "input": "3.000001",
+      "expected": false
+    },
+    {
+      "id": "fill_blank-16",
+      "type": "fill_blank",
+      "answer": "1/3",
+      "input": "0.333333",
+      "expected": true
+    },
+    {
+      "id": "fill_blank-17",
+      "type": "fill_blank",
+      "answer": "1/3",
+      "input": "0.333",
+      "expected": false
+    },
+    {
+      "id": "fill_blank-18",
+      "type": "fill_blank",
+      "answer": "1",
+      "input": "1/0",
+      "expected": false
+    },
+    {
+      "id": "fill_blank-19",
+      "type": "fill_blank",
+      "answer": "1/0",
+      "input": "1/0",
+      "expected": false
+    },
+    {
+      "id": "fill_blank-20",
+      "type": "fill_blank",
+      "answer": "0",
+      "input": "NaN",
+      "expected": false
+    },
+    {
+      "id": "fill_blank-21",
+      "type": "fill_blank",
+      "answer": "0",
+      "input": "Infinity",
+      "expected": false
+    },
+    {
+      "id": "fill_blank-22",
+      "type": "fill_blank",
+      "answer": "0",
+      "input": "-Infinity",
+      "expected": false
+    },
+    {
+      "id": "fill_blank-23",
+      "type": "fill_blank",
+      "answer": "2",
+      "input": "2/1/3",
+      "expected": false
+    },
+    {
+      "id": "fill_blank-24",
+      "type": "fill_blank",
+      "answer": "2",
+      "input": "+2",
+      "expected": true
+    },
+    {
+      "id": "fill_blank-25",
+      "type": "fill_blank",
+      "answer": "-0.5",
+      "input": "1/-2",
+      "expected": true
+    },
+    {
+      "id": "fill_blank-26",
+      "type": "fill_blank",
+      "answer": "0.5",
+      "input": "１／２",
+      "expected": true
+    },
+    {
+      "id": "fill_blank-27",
+      "type": "fill_blank",
+      "answer": "0.5",
+      "input": "½",
+      "expected": true
+    },
+    {
+      "id": "fill_blank-28",
+      "type": "fill_blank",
+      "answer": "5",
+      "input": "００５",
+      "expected": true
+    },
+    {
+      "id": "fill_blank-29",
+      "type": "fill_blank",
+      "answer": "1/2",
+      "input": "1/2x",
+      "expected": false
+    },
+    {
+      "id": "fill_blank-30",
+      "type": "fill_blank",
+      "answer": "3",
+      "input": "3+5",
+      "expected": false
+    },
+    {
+      "id": "fill_blank-31",
+      "type": "fill_blank",
+      "answer": "3",
+      "input": "3e0",
+      "expected": false
+    },
+    {
+      "id": "fill_blank-32",
+      "type": "fill_blank",
+      "answer": "不能计算",
+      "input": "不能计算",
+      "expected": true
+    },
+    {
+      "id": "fill_blank-33",
+      "type": "fill_blank",
+      "answer": "12÷3=4",
+      "input": "12 ÷ 3 = 4",
+      "expected": true
+    },
+    {
+      "id": "fill_blank-34",
+      "type": "fill_blank",
+      "answer": "3",
+      "input": "",
+      "expected": false
+    },
+    {
+      "id": "fill_blank-35",
+      "type": "fill_blank",
+      "answer": "3",
+      "input": "   ",
+      "expected": false
+    },
+    {
+      "id": "fill_blank-36",
+      "type": "fill_blank",
+      "answer": "3",
+      "input": null,
+      "expected": false
+    },
+    {
+      "id": "fill_blank-37",
+      "type": "fill_blank",
+      "answer": "3",
+      "input": 123,
+      "expected": false
+    },
+    {
+      "id": "calculation-38",
+      "type": "calculation",
+      "answer": "1/2",
+      "input": "1/3",
+      "expected": false
+    },
+    {
+      "id": "calculation-39",
+      "type": "calculation",
+      "answer": "3元",
+      "input": "3",
+      "expected": true
+    },
+    {
+      "id": "calculation-40",
+      "type": "calculation",
+      "answer": "3",
+      "input": "3suffix",
+      "expected": false
+    },
+    {
+      "id": "calculation-41",
+      "type": "calculation",
+      "answer": "25%",
+      "input": "0.25",
+      "expected": true
+    },
+    {
+      "id": "word_problem-42",
+      "type": "word_problem",
+      "answer": "1/2",
+      "input": "1/3",
+      "expected": false
+    },
+    {
+      "id": "word_problem-43",
+      "type": "word_problem",
+      "answer": "3元",
+      "input": "3",
+      "expected": true
+    },
+    {
+      "id": "word_problem-44",
+      "type": "word_problem",
+      "answer": "3",
+      "input": "3suffix",
+      "expected": false
+    },
+    {
+      "id": "word_problem-45",
+      "type": "word_problem",
+      "answer": "25%",
+      "input": "0.25",
+      "expected": true
+    },
+    {
+      "id": "true_false-46",
+      "type": "true_false",
+      "answer": "对",
+      "input": "TRUE",
+      "expected": true
+    },
+    {
+      "id": "true_false-47",
+      "type": "true_false",
+      "answer": "错",
+      "input": "False",
+      "expected": true
+    },
+    {
+      "id": "true_false-48",
+      "type": "true_false",
+      "answer": "True",
+      "input": "Ｔ",
+      "expected": true
+    },
+    {
+      "id": "true_false-49",
+      "type": "true_false",
+      "answer": "false",
+      "input": "y",
+      "expected": false
+    },
+    {
+      "id": "true_false-50",
+      "type": "true_false",
+      "answer": "对",
+      "input": "√",
+      "expected": true
+    },
+    {
+      "id": "true_false-51",
+      "type": "true_false",
+      "answer": "错",
+      "input": "×",
+      "expected": true
+    },
+    {
+      "id": "true_false-52",
+      "type": "true_false",
+      "answer": "不确定",
+      "input": "false",
+      "expected": false
+    },
+    {
+      "id": "true_false-53",
+      "type": "true_false",
+      "answer": "对",
+      "input": "invalid",
+      "expected": false
+    },
+    {
+      "id": "choice-54",
+      "type": "choice",
+      "answer": "an",
+      "input": "B",
+      "expected": true,
+      "options": [
+        "a",
+        "an",
+        "two",
+        "some"
+      ]
+    },
+    {
+      "id": "choice-55",
+      "type": "choice",
+      "answer": "an",
+      "input": "A",
+      "expected": false,
+      "options": [
+        "a",
+        "an",
+        "two",
+        "some"
+      ]
+    },
+    {
+      "id": "choice-56",
+      "type": "choice",
+      "answer": "b",
+      "input": "A",
+      "expected": true,
+      "options": [
+        "b",
+        "a",
+        "c"
+      ]
+    },
+    {
+      "id": "choice-57",
+      "type": "choice",
+      "answer": "b",
+      "input": "B",
+      "expected": false,
+      "options": [
+        "b",
+        "a",
+        "c"
+      ]
+    },
+    {
+      "id": "choice-58",
+      "type": "choice",
+      "answer": "a < b",
+      "input": "B",
+      "expected": true,
+      "options": [
+        "a > b",
+        "a < b",
+        "a = b"
+      ]
+    },
+    {
+      "id": "choice-59",
+      "type": "choice",
+      "answer": "B. yes",
+      "input": "b",
+      "expected": true,
+      "options": [
+        "no",
+        "yes",
+        "maybe"
+      ]
+    },
+    {
+      "id": "choice-60",
+      "type": "choice",
+      "answer": "B",
+      "input": "banana",
+      "expected": false,
+      "options": [
+        "no",
+        "yes"
+      ]
+    },
+    {
+      "id": "choice-61",
+      "type": "choice",
+      "answer": "香蕉",
+      "input": "Ｂ",
+      "expected": true,
+      "options": [
+        "A. 苹果",
+        "B. 香蕉"
+      ]
+    },
+    {
+      "id": "choice-62",
+      "type": "choice",
+      "answer": "B",
+      "input": "B",
+      "expected": false,
+      "options": []
+    },
+    {
+      "id": "fill_blank_text-63",
+      "type": "fill_blank_text",
+      "answer": "Hello!",
+      "input": " hello。 ",
+      "expected": true
+    },
+    {
+      "id": "fill_blank_text-64",
+      "type": "fill_blank_text",
+      "answer": "小明",
+      "input": "小红",
+      "expected": false
+    },
+    {
+      "id": "fill_blank_text-65",
+      "type": "fill_blank_text",
+      "answer": "hello",
+      "input": "ＨＥＬＬＯ",
+      "expected": true
+    },
+    {
+      "id": "fill_blank_text-66",
+      "type": "fill_blank_text",
+      "answer": "它是我的",
+      "input": "它是我的。",
+      "expected": true
+    },
+    {
+      "id": "word_order-67",
+      "type": "word_order",
+      "answer": "I,am,Sam",
+      "input": "I，am，Sam",
+      "expected": true
+    },
+    {
+      "id": "word_order-68",
+      "type": "word_order",
+      "answer": "I,am,Sam",
+      "input": "Sam,am,I",
+      "expected": false
+    },
+    {
+      "id": "word_order-69",
+      "type": "word_order",
+      "answer": "I,am,Sam",
+      "input": "i,am,Sam",
+      "expected": false
+    },
+    {
+      "id": "matching-70",
+      "type": "matching",
+      "answer": "A-1,B-2",
+      "input": "B-2,A-1",
+      "expected": true
+    },
+    {
+      "id": "matching-71",
+      "type": "matching",
+      "answer": "A-1,B-2",
+      "input": "Ａ－１，Ｂ－２",
+      "expected": true
+    },
+    {
+      "id": "matching-72",
+      "type": "matching",
+      "answer": "A-1,B-2",
+      "input": "A-0,A-1,B-2",
+      "expected": false
+    },
+    {
+      "id": "matching-73",
+      "type": "matching",
+      "answer": "A-1,B-2",
+      "input": "A-1,B-2,junk",
+      "expected": false
+    },
+    {
+      "id": "matching-74",
+      "type": "matching",
+      "answer": "A-1,B-2",
+      "input": "A-1,B-1",
+      "expected": false
+    },
+    {
+      "id": "matching-75",
+      "type": "matching",
+      "answer": "A-1,B-2",
+      "input": "A-1",
+      "expected": false
+    },
+    {
+      "id": "matching-76",
+      "type": "matching",
+      "answer": "A-1,B-2",
+      "input": "A-1,B-2,",
+      "expected": false
+    },
+    {
+      "id": "matching-77",
+      "type": "matching",
+      "answer": "",
+      "input": "garbage",
+      "expected": false
+    },
+    {
+      "id": "unicode-whitespace-numeric",
+      "type": "fill_blank",
+      "answer": "3",
+      "input": "3",
+      "expected": true
+    },
+    {
+      "id": "unicode-whitespace-choice",
+      "type": "choice",
+      "answer": "B",
+      "options": [
+        "no",
+        "yes"
+      ],
+      "input": "﻿B",
+      "expected": true
+    },
+    {
+      "id": "unicode-empty-text",
+      "type": "fill_blank_text",
+      "answer": "",
+      "input": "﻿",
+      "expected": false
+    }
+  ]
+}

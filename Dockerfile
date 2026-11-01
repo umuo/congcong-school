@@ -1,6 +1,8 @@
 FROM node:22-bookworm-slim AS build
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
+ARG CSF_APP_MODE=cloud
+ENV NEXT_PUBLIC_APP_MODE=$CSF_APP_MODE
 RUN apt-get update \
     && apt-get install -y --no-install-recommends python3 ffmpeg ca-certificates \
     && rm -rf /var/lib/apt/lists/*
@@ -24,7 +26,8 @@ COPY release/audio-version-map.json release/audio-version-map.json
 COPY release/content-baseline-v1.4.0.json release/content-baseline-v1.4.0.json
 COPY scripts/checks/content-retention.py scripts/checks/content-retention.py
 COPY scripts/run-python.mjs scripts/run-python.mjs
-RUN npm run build
+COPY scripts/cloud scripts/cloud
+RUN npm run build:data --workspace=china-study-free && npm run build
 
 FROM nginx:stable-alpine AS runtime
 COPY docker/nginx.conf /etc/nginx/nginx.conf
@@ -41,4 +44,5 @@ COPY --chown=nginx:nginx --from=site / /usr/share/nginx/html
 
 # Default: build everything, including verified resources and MP3 audio.
 FROM runtime AS production
-COPY --chown=nginx:nginx --from=build /app/apps/web/out /usr/share/nginx/html
+ARG CSF_APP_MODE=cloud
+COPY --chown=nginx:nginx --from=build /app/apps/web/.build/${CSF_APP_MODE}/out /usr/share/nginx/html

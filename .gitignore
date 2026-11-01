@@ -21,6 +21,7 @@ env/
 node_modules/
 .next/
 out/
+.build/
 dist/
 build/
 *.tsbuildinfo
@@ -71,3 +72,6 @@ release-assets/
 
 # Local build verification and audio conversion cache
 deploy-output/
+
+# Generated private cloud question banks (never publish as static web assets)
+apps/api/private-content/

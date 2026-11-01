@@ -121,6 +121,14 @@
 
 完整功能、平台差异和已知限制见[功能总览](docs/feature-overview.md)。
 
+家庭学习系统二次开发的源码分析、复用方案与运行基线见 [M0 技术审计](docs/family-learning-m0-audit.md)。
+
+三类账号登录、管理员开通账号和本地预览见 [家庭账号使用说明](docs/family-account-guide.md)。
+
+跨电脑继续开发请先读 [当前交接记录](docs/family-learning-handoff.md)（21/32 任务完成，包含未完成范围、环境与数据库版本）。
+
+独立产物及启动命令见 [local/cloud 构建说明](docs/local-cloud-builds.md)，私有题库与学习 API 见 [内容服务](docs/cloud-content-service.md) 和 [学习会话契约](docs/cloud-learning-session-api.md)。云端儿童学习界面、奖励结算及完整部署仍按任务清单接入。
+
 | 功能 | 说明 |
 |------|------|
 | **单元小测** | 跟着课本章节走，学完一课就能练 |

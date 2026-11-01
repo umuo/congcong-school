@@ -1,0 +1,685 @@
+{
+  "version": "cstf-economy-1",
+  "source_hashes": {
+    "packages/core/src/economy.ts": "1ee6bdfa3903937406ad462c1b6e4500de168d9b801536e25fa61642120a187a",
+    "packages/core/src/cosmetics.ts": "31d38023b1a2053c575d1ce026d4d9908c4003a8f3b5299ac52ec3f634176366",
+    "packages/core/src/achievements.ts": "053eab24c82985e228372884fd1f80ab614212f22e05171b42b16e0ec1219236",
+    "packages/core/src/quests.ts": "501b71f40e1f6d10f011f7908c955c677e386fff8138191dc959dcc73096e308",
+    "packages/core/src/numberSense.ts": "de41d0f57f21591aa1bf818bba95f316865778eec0b881248fb6e1e8efa82973"
+  },
+  "constants": {
+    "DAILY_GOAL_BONUS": 20,
+    "DAILY_GOAL_OPTIONS": [
+      20,
+      50,
+      100,
+      200
+    ],
+    "DAILY_REWARD_TABLE": [
+      5,
+      5,
+      8,
+      12,
+      15,
+      20,
+      25,
+      30
+    ],
+    "DEFAULT_DAILY_GOAL": 50,
+    "EXAM_XP_MULTIPLIER": 2,
+    "FIRST_PERFECT_GEM_BONUS": 15,
+    "FIRST_PERFECT_XP_BONUS": 5,
+    "FREEZE_COST": 200,
+    "HEART_REFILL_COST": 350,
+    "HEART_REGEN_SECONDS": 300,
+    "INITIAL_FREEZES": 2,
+    "LESSON_GEM_BASE": 3,
+    "LESSON_GEM_THREE_STAR_BONUS": 10,
+    "LESSON_GEM_TWO_STAR_BONUS": 5,
+    "MAX_FREEZES": 2,
+    "MAX_HEARTS": 5,
+    "PERFECT_XP_BONUS": 5,
+    "READING_XP": {
+      "listen": 5,
+      "followup": 10,
+      "storyGood": 15,
+      "storyBase": 5,
+      "goodThreshold": 0.8
+    },
+    "REVIEW_HEART_MIN_CORRECT": 5,
+    "REVIEW_HEART_REWARD": 1,
+    "STREAK_MAKEUP_COST": 50,
+    "STREAK_MILESTONE_REWARDS": {
+      "3": 30,
+      "7": 80,
+      "14": 150,
+      "30": 300,
+      "60": 500,
+      "100": 800
+    },
+    "THREE_STAR_ACCURACY": 0.95,
+    "TWO_STAR_ACCURACY": 0.8,
+    "WEEKEND_XP_MULTIPLIER": 2,
+    "XP_PER_CORRECT": 10
+  },
+  "cosmetics": [
+    {
+      "id": "skin_default",
+      "type": "mascot_skin",
+      "name": "原版聪聪",
+      "description": "我们最熟悉的熊猫聪聪",
+      "cost": 0,
+      "rarity": "common",
+      "starter": true
+    },
+    {
+      "id": "skin_graduate",
+      "type": "mascot_skin",
+      "name": "学士帽",
+      "description": "戴上学士帽的聪聪，学者气质满分",
+      "cost": 80,
+      "rarity": "common"
+    },
+    {
+      "id": "skin_glasses",
+      "type": "mascot_skin",
+      "name": "圆框眼镜",
+      "description": "复古圆框眼镜，文艺青年聪聪",
+      "cost": 100,
+      "rarity": "common"
+    },
+    {
+      "id": "skin_party",
+      "type": "mascot_skin",
+      "name": "派对锥帽",
+      "description": "彩虹色派对帽，每天都是节日",
+      "cost": 150,
+      "rarity": "rare"
+    },
+    {
+      "id": "skin_crown",
+      "type": "mascot_skin",
+      "name": "金色皇冠",
+      "description": "学习路上的小国王/小女王",
+      "cost": 250,
+      "rarity": "rare"
+    },
+    {
+      "id": "skin_wizard",
+      "type": "mascot_skin",
+      "name": "法师尖帽",
+      "description": "知识就是魔法",
+      "cost": 300,
+      "rarity": "epic"
+    },
+    {
+      "id": "skin_astronaut",
+      "type": "mascot_skin",
+      "name": "宇航员头盔",
+      "description": "向知识的宇宙出发！",
+      "cost": 500,
+      "rarity": "legendary"
+    },
+    {
+      "id": "skin_sunglasses",
+      "type": "mascot_skin",
+      "name": "酷炫墨镜",
+      "description": "Cool 到没朋友的墨镜聪聪",
+      "cost": 120,
+      "rarity": "common"
+    },
+    {
+      "id": "skin_pirate",
+      "type": "mascot_skin",
+      "name": "海盗船长",
+      "description": "扬帆出海寻知识宝藏",
+      "cost": 220,
+      "rarity": "rare"
+    },
+    {
+      "id": "skin_headphones",
+      "type": "mascot_skin",
+      "name": "DJ 耳机",
+      "description": "戴上耳机就能听见学习节奏",
+      "cost": 180,
+      "rarity": "rare"
+    },
+    {
+      "id": "skin_laurel",
+      "type": "mascot_skin",
+      "name": "桂冠加身",
+      "description": "胜利者才能戴的金色桂冠",
+      "cost": 280,
+      "rarity": "epic"
+    },
+    {
+      "id": "skin_bowtie",
+      "type": "mascot_skin",
+      "name": "绅士领结",
+      "description": "戴上领结就是优雅的小学者",
+      "cost": 60,
+      "rarity": "common"
+    },
+    {
+      "id": "theme_default",
+      "type": "ui_theme",
+      "name": "Duolingo 绿",
+      "description": "经典清爽的草地绿",
+      "cost": 0,
+      "rarity": "common",
+      "starter": true,
+      "data": {
+        "primary": "#58CC02",
+        "primaryDark": "#58A700",
+        "accent": "#1CB0F6",
+        "bg": "#F7F7F7"
+      }
+    },
+    {
+      "id": "theme_ocean",
+      "type": "ui_theme",
+      "name": "海洋蓝",
+      "description": "像在大海里学习",
+      "cost": 200,
+      "rarity": "common",
+      "data": {
+        "primary": "#1CB0F6",
+        "primaryDark": "#1899D6",
+        "accent": "#58CC02",
+        "bg": "#EFF8FE"
+      }
+    },
+    {
+      "id": "theme_sakura",
+      "type": "ui_theme",
+      "name": "樱花粉",
+      "description": "粉嫩可爱的春天",
+      "cost": 200,
+      "rarity": "common",
+      "data": {
+        "primary": "#FF7AB6",
+        "primaryDark": "#E5588E",
+        "accent": "#FFC800",
+        "bg": "#FDF3F8"
+      }
+    },
+    {
+      "id": "theme_sunshine",
+      "type": "ui_theme",
+      "name": "阳光黄",
+      "description": "充满活力的金色",
+      "cost": 250,
+      "rarity": "rare",
+      "data": {
+        "primary": "#FFB200",
+        "primaryDark": "#E59800",
+        "accent": "#FF6B6B",
+        "bg": "#FFF9E8"
+      }
+    },
+    {
+      "id": "theme_galaxy",
+      "type": "ui_theme",
+      "name": "星空紫",
+      "description": "深邃神秘的宇宙紫",
+      "cost": 400,
+      "rarity": "epic",
+      "data": {
+        "primary": "#A855F7",
+        "primaryDark": "#7C3AED",
+        "accent": "#FFC800",
+        "bg": "#F5EEFF"
+      }
+    },
+    {
+      "id": "theme_mint",
+      "type": "ui_theme",
+      "name": "薄荷青",
+      "description": "清新提神的薄荷青绿",
+      "cost": 220,
+      "rarity": "common",
+      "data": {
+        "primary": "#10B981",
+        "primaryDark": "#059669",
+        "accent": "#FBBF24",
+        "bg": "#ECFDF5"
+      }
+    },
+    {
+      "id": "theme_coral",
+      "type": "ui_theme",
+      "name": "珊瑚红",
+      "description": "温暖热情的活力珊瑚",
+      "cost": 300,
+      "rarity": "rare",
+      "data": {
+        "primary": "#FF6B6B",
+        "primaryDark": "#E5484D",
+        "accent": "#1CB0F6",
+        "bg": "#FFF4F4"
+      }
+    },
+    {
+      "id": "theme_aurora",
+      "type": "ui_theme",
+      "name": "极光",
+      "description": "梦幻的北极极光蓝绿",
+      "cost": 500,
+      "rarity": "legendary",
+      "data": {
+        "primary": "#22D3EE",
+        "primaryDark": "#0891B2",
+        "accent": "#A855F7",
+        "bg": "#ECFEFF"
+      }
+    },
+    {
+      "id": "theme_midnight",
+      "type": "ui_theme",
+      "name": "暗夜模式",
+      "description": "护眼的深色界面，傍晚学习不刺眼",
+      "cost": 350,
+      "rarity": "epic",
+      "data": {
+        "primary": "#58CC02",
+        "primaryDark": "#3B9A00",
+        "accent": "#1CB0F6",
+        "bg": "#0F1419",
+        "isDark": true,
+        "cardBg": "#1B2230",
+        "borderSoft": "#2A3343",
+        "ink": "#F1F5F9",
+        "inkLight": "#CBD5E1",
+        "inkSofter": "#94A3B8",
+        "bgSoft": "#0F1419",
+        "bgSofter": "#1B2230"
+      }
+    },
+    {
+      "id": "theme_obsidian",
+      "type": "ui_theme",
+      "name": "曜石黑",
+      "description": "极简纯黑配霓虹蓝，潮酷十足",
+      "cost": 480,
+      "rarity": "legendary",
+      "data": {
+        "primary": "#1CB0F6",
+        "primaryDark": "#0E7FB8",
+        "accent": "#A855F7",
+        "bg": "#08090C",
+        "isDark": true,
+        "cardBg": "#13151B",
+        "borderSoft": "#1F2330",
+        "ink": "#F8FAFC",
+        "inkLight": "#CBD5E1",
+        "inkSofter": "#94A3B8",
+        "bgSoft": "#08090C",
+        "bgSofter": "#13151B"
+      }
+    },
+    {
+      "id": "backdrop_default",
+      "type": "lesson_backdrop",
+      "name": "干净简洁",
+      "description": "默认的纯净背景",
+      "cost": 0,
+      "rarity": "common",
+      "starter": true,
+      "data": {
+        "background": "#F7F7F7"
+      }
+    },
+    {
+      "id": "backdrop_clouds",
+      "type": "lesson_backdrop",
+      "name": "蓝天白云",
+      "description": "在云朵里学习",
+      "cost": 120,
+      "rarity": "common",
+      "data": {
+        "background": "linear-gradient(180deg, #BFE3F7 0%, #E6F3FB 50%, #FFFFFF 100%)"
+      }
+    },
+    {
+      "id": "backdrop_forest",
+      "type": "lesson_backdrop",
+      "name": "森林晨光",
+      "description": "清晨的森林透着阳光",
+      "cost": 150,
+      "rarity": "common",
+      "data": {
+        "background": "linear-gradient(180deg, #D7F0CF 0%, #EDF8E5 60%, #FFFFFF 100%)"
+      }
+    },
+    {
+      "id": "backdrop_sunset",
+      "type": "lesson_backdrop",
+      "name": "黄昏彩霞",
+      "description": "傍晚的天空是橘粉色",
+      "cost": 200,
+      "rarity": "rare",
+      "data": {
+        "background": "linear-gradient(180deg, #FFD7B3 0%, #FFE9D6 50%, #FFFFFF 100%)"
+      }
+    },
+    {
+      "id": "backdrop_starfield",
+      "type": "lesson_backdrop",
+      "name": "星空夜",
+      "description": "深邃的紫色星空",
+      "cost": 350,
+      "rarity": "epic",
+      "data": {
+        "background": "radial-gradient(ellipse at top, #2A1B5C 0%, #1A0F3D 60%, #0F0822 100%)",
+        "needsOverlay": true
+      }
+    },
+    {
+      "id": "backdrop_sakura",
+      "type": "lesson_backdrop",
+      "name": "樱花飘落",
+      "description": "粉色花瓣的春日",
+      "cost": 220,
+      "rarity": "rare",
+      "data": {
+        "background": "linear-gradient(180deg, #FFE0EC 0%, #FFF0F6 50%, #FFFFFF 100%)"
+      }
+    },
+    {
+      "id": "backdrop_ocean",
+      "type": "lesson_backdrop",
+      "name": "深海漫游",
+      "description": "在海底世界学习",
+      "cost": 280,
+      "rarity": "rare",
+      "data": {
+        "background": "linear-gradient(180deg, #93C5FD 0%, #BFDBFE 50%, #DBEAFE 100%)"
+      }
+    },
+    {
+      "id": "backdrop_aurora",
+      "type": "lesson_backdrop",
+      "name": "极光夜",
+      "description": "极地夜空的彩色光带",
+      "cost": 480,
+      "rarity": "legendary",
+      "data": {
+        "background": "linear-gradient(180deg, #064E3B 0%, #047857 30%, #0E7490 60%, #312E81 100%)",
+        "needsOverlay": true
+      }
+    }
+  ],
+  "equipped": {
+    "mascotSkin": "skin_default",
+    "uiTheme": "theme_default",
+    "lessonBackdrop": "backdrop_default"
+  },
+  "achievements": [
+    {
+      "id": "first-lesson",
+      "category": "milestone",
+      "name": "出师告捷",
+      "description": "完成你的第一节课",
+      "iconKey": "rocket",
+      "color": "#1CB0F6",
+      "goal": 1,
+      "reward": 20,
+      "metric": "lessons"
+    },
+    {
+      "id": "ten-lessons",
+      "category": "milestone",
+      "name": "学海十里",
+      "description": "累计完成 10 节课",
+      "iconKey": "bookmark",
+      "color": "#1CB0F6",
+      "goal": 10,
+      "reward": 50,
+      "metric": "lessons"
+    },
+    {
+      "id": "fifty-lessons",
+      "category": "milestone",
+      "name": "百炼成钢",
+      "description": "累计完成 50 节课",
+      "iconKey": "trophy",
+      "color": "#A855F7",
+      "goal": 50,
+      "reward": 100,
+      "metric": "lessons"
+    },
+    {
+      "id": "xp-100",
+      "category": "milestone",
+      "name": "初露锋芒",
+      "description": "累计 100 经验",
+      "iconKey": "lightning",
+      "color": "#1CB0F6",
+      "goal": 100,
+      "reward": 20,
+      "metric": "xp"
+    },
+    {
+      "id": "xp-1000",
+      "category": "milestone",
+      "name": "经验丰富",
+      "description": "累计 1000 经验",
+      "iconKey": "lightning",
+      "color": "#A855F7",
+      "goal": 1000,
+      "reward": 50,
+      "metric": "xp"
+    },
+    {
+      "id": "xp-5000",
+      "category": "milestone",
+      "name": "学霸认证",
+      "description": "累计 5000 经验",
+      "iconKey": "lightning",
+      "color": "#FFC800",
+      "goal": 5000,
+      "reward": 100,
+      "metric": "xp"
+    },
+    {
+      "id": "streak-3",
+      "category": "streak",
+      "name": "三日不辍",
+      "description": "连续学习 3 天",
+      "iconKey": "flame",
+      "color": "#FF9600",
+      "goal": 3,
+      "reward": 20,
+      "metric": "streak"
+    },
+    {
+      "id": "streak-7",
+      "category": "streak",
+      "name": "一周如一日",
+      "description": "连续学习 7 天",
+      "iconKey": "flame",
+      "color": "#FF9600",
+      "goal": 7,
+      "reward": 50,
+      "metric": "streak"
+    },
+    {
+      "id": "streak-30",
+      "category": "streak",
+      "name": "月度坚持",
+      "description": "连续学习 30 天",
+      "iconKey": "flame",
+      "color": "#FF4B4B",
+      "goal": 30,
+      "reward": 100,
+      "metric": "streak"
+    },
+    {
+      "id": "streak-100",
+      "category": "streak",
+      "name": "百日行者",
+      "description": "连续学习 100 天",
+      "iconKey": "flame",
+      "color": "#FFC800",
+      "goal": 100,
+      "reward": 100,
+      "metric": "streak"
+    },
+    {
+      "id": "perfect-1",
+      "category": "perfection",
+      "name": "完美初体验",
+      "description": "首次三星通关一节课",
+      "iconKey": "star",
+      "color": "#FFC800",
+      "goal": 1,
+      "reward": 20,
+      "metric": "perfect"
+    },
+    {
+      "id": "perfect-10",
+      "category": "perfection",
+      "name": "完美十连",
+      "description": "三星通关 10 节课",
+      "iconKey": "star",
+      "color": "#FFC800",
+      "goal": 10,
+      "reward": 50,
+      "metric": "perfect"
+    },
+    {
+      "id": "perfect-50",
+      "category": "perfection",
+      "name": "无暇修行",
+      "description": "三星通关 50 节课",
+      "iconKey": "crown",
+      "color": "#A855F7",
+      "goal": 50,
+      "reward": 100,
+      "metric": "perfect"
+    },
+    {
+      "id": "first-cosmetic",
+      "category": "shop",
+      "name": "时尚启航",
+      "description": "解锁第一件聪聪的装扮",
+      "iconKey": "sparkle",
+      "color": "#A855F7",
+      "goal": 1,
+      "reward": 20,
+      "metric": "cosmetics"
+    },
+    {
+      "id": "gem-collector",
+      "category": "shop",
+      "name": "宝石收藏家",
+      "description": "累计获得 500 颗宝石",
+      "iconKey": "gem",
+      "color": "#A855F7",
+      "goal": 500,
+      "reward": 50,
+      "metric": "lifetimeGems"
+    },
+    {
+      "id": "first-review",
+      "category": "review",
+      "name": "知错就改",
+      "description": "在错题本中复习一道题",
+      "iconKey": "medal",
+      "color": "#58CC02",
+      "goal": 1,
+      "reward": 20,
+      "metric": "reviews"
+    }
+  ],
+  "quests": [
+    {
+      "kind": "earnXP",
+      "target": 30,
+      "reward": 10,
+      "id": "earnXP-30",
+      "title": "获得 30 点经验"
+    },
+    {
+      "kind": "earnXP",
+      "target": 60,
+      "reward": 15,
+      "id": "earnXP-60",
+      "title": "获得 60 点经验"
+    },
+    {
+      "kind": "earnXP",
+      "target": 100,
+      "reward": 25,
+      "id": "earnXP-100",
+      "title": "获得 100 点经验"
+    },
+    {
+      "kind": "finishLessons",
+      "target": 1,
+      "reward": 10,
+      "id": "finishLessons-1",
+      "title": "完成 1 节小课"
+    },
+    {
+      "kind": "finishLessons",
+      "target": 2,
+      "reward": 20,
+      "id": "finishLessons-2",
+      "title": "完成 2 节小课"
+    },
+    {
+      "kind": "finishLessons",
+      "target": 3,
+      "reward": 30,
+      "id": "finishLessons-3",
+      "title": "完成 3 节小课"
+    },
+    {
+      "kind": "reviewMistakes",
+      "target": 1,
+      "reward": 10,
+      "id": "reviewMistakes-1",
+      "title": "复习 1 道错题"
+    },
+    {
+      "kind": "reviewMistakes",
+      "target": 3,
+      "reward": 20,
+      "id": "reviewMistakes-3",
+      "title": "复习 3 道错题"
+    },
+    {
+      "kind": "readTexts",
+      "target": 1,
+      "reward": 15,
+      "id": "readTexts-1",
+      "title": "读完 1 篇课文或故事"
+    },
+    {
+      "kind": "readTexts",
+      "target": 2,
+      "reward": 25,
+      "id": "readTexts-2",
+      "title": "读完 2 篇课文或故事"
+    }
+  ],
+  "number_lessons": {
+    "count": {
+      "id": "g1up-u1-kp1",
+      "title": "数一数，认一认",
+      "goal": "一个不漏地数到10，把物体和数字对起来。"
+    },
+    "compare": {
+      "id": "g1up-u1-kp2",
+      "title": "配一配，比多少",
+      "goal": "一个配一个，找出同样多和谁多谁少。"
+    },
+    "apply": {
+      "id": "g1up-u1-kp3",
+      "title": "分一分，够不够",
+      "goal": "给每个朋友分一个，判断够不够。"
+    }
+  },
+  "number_version": 1
+}

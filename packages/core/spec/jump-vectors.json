@@ -1,0 +1,63 @@
+[
+  {
+    "seed": "seed-1",
+    "size": 15,
+    "counts": [
+      10,
+      10,
+      10,
+      10,
+      10
+    ],
+    "expected": [
+      "lesson-3:3",
+      "lesson-2:7",
+      "lesson-3:8",
+      "lesson-2:10",
+      "lesson-1:9",
+      "lesson-2:3",
+      "lesson-3:5",
+      "lesson-1:6",
+      "lesson-4:4",
+      "lesson-0:1",
+      "lesson-1:3",
+      "lesson-4:9",
+      "lesson-4:1",
+      "lesson-0:9",
+      "lesson-0:3"
+    ]
+  },
+  {
+    "seed": "中文种子",
+    "size": 15,
+    "counts": [
+      2,
+      3,
+      1
+    ],
+    "expected": [
+      "lesson-2:1",
+      "lesson-0:1",
+      "lesson-1:2",
+      "lesson-1:3",
+      "lesson-0:2",
+      "lesson-1:1"
+    ]
+  },
+  {
+    "seed": "retry",
+    "size": 5,
+    "counts": [
+      3,
+      0,
+      5
+    ],
+    "expected": [
+      "lesson-0:2",
+      "lesson-0:1",
+      "lesson-2:3",
+      "lesson-2:1",
+      "lesson-2:5"
+    ]
+  }
+]

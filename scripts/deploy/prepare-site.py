@@ -14,7 +14,8 @@ from media_types import MEDIA_FOLDERS, expected_extension_type, media_content_ty
 
 ROOT = Path(__file__).resolve().parents[2]
 DIRECTORIES = {'_next','audio','data','story-images','textbook-pages','book','grade',
-               'lesson','reading','stories','profile','review','shop','404','jump','league','number-sense','icons'}
+               'lesson','reading','stories','profile','review','shop','404','jump','league','number-sense','icons',
+               'login','admin','parent','learn','change-password'}
 ROOT_FILES = {'index.html','index.txt','404.html','icon.svg','robots.txt','sitemap.xml',
               'content-revision.html','content-revision-status.json','manifest.webmanifest','sw.js'}
 
@@ -35,10 +36,19 @@ def preserve_media_timestamp(path, destination, rel):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--source', type=Path, default=ROOT/'apps/web/out')
-    parser.add_argument('--destination', type=Path, default=ROOT/'deploy-output/site')
+    parser.add_argument('--mode', choices=['local','cloud'], default='cloud')
+    parser.add_argument('--source', type=Path)
+    parser.add_argument('--destination', type=Path)
     parser.add_argument('--previous-site', type=Path, help='Verified previous snapshot; preserve timestamps only for identical media.')
     args = parser.parse_args()
+    args.source = args.source or ROOT/'apps/web/.build'/args.mode/'out'
+    args.destination = args.destination or ROOT/'deploy-output'/('site-'+args.mode)
+    if args.mode == 'cloud':
+        subprocess.run([sys.executable, str(ROOT/'scripts/cloud/scan-artifact.py'), str(args.source)], check=True)
+        import shutil
+        shutil.copytree(args.source, args.destination)
+        print(json.dumps({'mode':'cloud','status':'passed','source':'isolated cloud artifact'},ensure_ascii=False))
+        return
     subprocess.run([sys.executable, str(ROOT / 'scripts/checks/content-retention.py'),
                     '--public', str(args.source)], check=True)
     args.destination.mkdir(parents=True, exist_ok=False)

@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:16@sha256:1beaa3084eee2676f20a9cd9928f0bf2c5bf674f8e49f81017912183d377c61c
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: cstf_app
+      POSTGRES_DB: cstf_dev
+      POSTGRES_PASSWORD: ${CSF_POSTGRES_PASSWORD:?Set a random database password}
+    ports:
+      - "127.0.0.1:${CSF_POSTGRES_PORT:-15432}:5432"
+    volumes:
+      - family-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cstf_app -d cstf_dev"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  family-postgres:
