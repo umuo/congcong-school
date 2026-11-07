@@ -11,9 +11,13 @@
     "build": "npm run build --workspace=china-study-free",
     "type-check": "npm run type-check --workspaces --if-present",
     "test": "npm test --workspace=@cstf/core",
+    "check:learning-client": "node --import tsx scripts/checks/learning-client.ts && TSX_TSCONFIG_PATH=scripts/checks/tsconfig.json node --import tsx scripts/checks/learning-provider.tsx && TSX_TSCONFIG_PATH=scripts/checks/tsconfig.json node --import tsx scripts/checks/learner-profiles.ts && node scripts/checks/account-shell.mjs",
     "check:web-experience": "tsx --tsconfig scripts/checks/tsconfig.json scripts/checks/answer-feedback.tsx && tsx --tsconfig scripts/checks/tsconfig.json scripts/checks/text-answer-keyboard.tsx && tsx --tsconfig scripts/checks/tsconfig.json scripts/checks/numeric-answer-keyboard.tsx && tsx --tsconfig scripts/checks/tsconfig.json scripts/checks/jump-loading.ts && tsx --tsconfig scripts/checks/tsconfig.json scripts/checks/reading-session.ts && tsx --tsconfig scripts/checks/tsconfig.json scripts/checks/recorder-lifecycle.ts && tsx scripts/checks/theme-colors.ts",
     "check:learning-quality": "tsx --tsconfig scripts/checks/tsconfig.json scripts/checks/weekly-learning.tsx && tsx --tsconfig scripts/checks/tsconfig.json scripts/checks/number-sense.tsx && tsx --tsconfig scripts/checks/tsconfig.json scripts/checks/current-first-lesson.tsx",
-    "check:visual-controls": "tsx --tsconfig scripts/checks/tsconfig.json scripts/checks/visual-controls.tsx"
+    "check:visual-controls": "tsx --tsconfig scripts/checks/tsconfig.json scripts/checks/visual-controls.tsx",
+    "check:avatars": "node scripts/cloud/export-avatar-catalog.mjs --check && TSX_TSCONFIG_PATH=scripts/checks/tsconfig.json node --import tsx scripts/checks/avatars.tsx",
+    "check:child-ui": "TSX_TSCONFIG_PATH=scripts/checks/tsconfig.json node --import tsx scripts/checks/forest-experience.ts && node --import tsx scripts/checks/theme-colors.ts",
+    "check:diagnostics": "TSX_TSCONFIG_PATH=scripts/checks/tsconfig.json node --import tsx scripts/checks/knowledge-diagnostics.tsx"
   },
   "devDependencies": {
     "react-test-renderer": "19.2.5"

@@ -9,7 +9,6 @@ from app.config import get_settings
 from app.database import Base
 
 target_metadata = Base.metadata
-url = get_settings().database_url.get_secret_value()
 
 
 def run(connection):
@@ -19,6 +18,7 @@ def run(connection):
 
 
 async def online():
+    url = get_settings().database_url.get_secret_value()
     engine = create_async_engine(url, poolclass=pool.NullPool)
     async with engine.connect() as connection:
         await connection.run_sync(run)
@@ -26,8 +26,13 @@ async def online():
 
 
 if context.is_offline_mode():
+    url = get_settings().database_url.get_secret_value()
     context.configure(url=url, target_metadata=target_metadata, literal_binds=True)
     with context.begin_transaction():
         context.run_migrations()
 else:
-    asyncio.run(online())
+    connection = context.config.attributes.get("connection")
+    if connection is not None:
+        run(connection)
+    else:
+        asyncio.run(online())

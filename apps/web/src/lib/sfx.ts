@@ -29,6 +29,12 @@ export type SfxName =
 
 let ctx: AudioContext | null = null;
 let muted = false;
+let effectsMuted = false;
+const audioOwners = new Set<object>();
+export function setEffectsMuted(value: boolean) { effectsMuted = value; if (value) stopEffects(); }
+/** A release token keeps overlapping speech/recording owners independent. */
+export function suppressEffects() { const token = {}; audioOwners.add(token); stopEffects(); return () => { audioOwners.delete(token); }; }
+export function stopEffects() { if (ctx && ctx.state === "running") void ctx.suspend().catch(() => {}); }
 let masterGain: GainNode | null = null;
 let masterFilter: BiquadFilterNode | null = null;
 let compressor: DynamicsCompressorNode | null = null;
@@ -287,8 +293,9 @@ function noiseBurst(
 // ============================================================
 
 export function playSfx(name: SfxName, opts: { volume?: number } = {}) {
-  if (muted) return;
-  const c = ensureCtx();
+  if (muted || effectsMuted || audioOwners.size) return;
+  let c: AudioContext | null;
+  try { c = ensureCtx(); } catch { return; }
   if (!c) return;
   const now = c.currentTime;
   const v = opts.volume ?? 1;
@@ -530,10 +537,11 @@ export function playSfx(name: SfxName, opts: { volume?: number } = {}) {
 export function primeAudioOnFirstGesture() {
   if (typeof window === "undefined") return;
   const prime = () => {
-    ensureCtx();
+    try { ensureCtx(); } catch { /* audio is optional */ }
     window.removeEventListener("pointerdown", prime);
     window.removeEventListener("keydown", prime);
   };
   window.addEventListener("pointerdown", prime, { once: false });
   window.addEventListener("keydown", prime, { once: false });
+  return () => { window.removeEventListener("pointerdown", prime); window.removeEventListener("keydown", prime); };
 }

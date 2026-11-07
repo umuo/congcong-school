@@ -9,7 +9,8 @@
  *   - 简单 LRU 预加载（避免重复 fetch）
  */
 
-import { isMuted } from "./sfx";
+import { isMuted, suppressEffects } from "./sfx";
+import { onLearningInvalidated } from "./learning/lifecycle";
 
 let el: HTMLAudioElement | null = null;
 let currentSrc: string | null = null;
@@ -19,6 +20,13 @@ export type TTSPlaybackResult = "ended" | "interrupted" | "error" | "blocked" | 
 
 const preloaded = new Map<string, HTMLAudioElement>();
 const PRELOAD_MAX = 16;
+onLearningInvalidated(() => {
+  finishCurrent?.("interrupted");
+  if (el) { el.pause(); el.removeAttribute("src"); el.load(); }
+  currentSrc = null;
+  for (const audio of preloaded.values()) { audio.pause(); audio.removeAttribute("src"); audio.load(); }
+  preloaded.clear();
+});
 
 function playbackSources(src: string): string[] {
   // Persisted mistake questions can still point at the previous Ogg/Opus assets.
@@ -81,6 +89,7 @@ export function playTTSResult(src: string | undefined | null): Promise<TTSPlayba
   currentSrc = src;
   const sources = playbackSources(src);
 
+  const releaseEffects = suppressEffects();
   return new Promise<TTSPlaybackResult>(resolve => {
     let done = false;
     let attempt = -1;
@@ -96,6 +105,7 @@ export function playTTSResult(src: string | undefined | null): Promise<TTSPlayba
     const finish = (result: TTSPlaybackResult) => {
       if (done) return;
       done = true;
+      releaseEffects();
       clearInterval(watchdog);
       cleanupAttempt();
       if (finishCurrent === finish) {

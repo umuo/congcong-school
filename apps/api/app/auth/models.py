@@ -29,6 +29,8 @@ class User(SQLAlchemyBaseUserTableUUID, Base):
     role: Mapped[str] = mapped_column(String(16), default="parent")
     must_change_password: Mapped[bool] = mapped_column(default=False)
     nickname: Mapped[str] = mapped_column(String(80))
+    avatar: Mapped[str | None] = mapped_column(String(32))
+    avatar_revision: Mapped[int | None] = mapped_column(Integer)
 
 
 class StudentAccount(Base):

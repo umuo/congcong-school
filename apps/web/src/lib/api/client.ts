@@ -1,3 +1,5 @@
+import { invalidateLearning } from "../learning/lifecycle";
+
 export interface Account {
   context_id: string;
   role: "admin" | "parent" | "student";
@@ -62,9 +64,12 @@ export async function api<T>(
         "AUTH_REQUIRED",
         "PASSWORD_CHANGE_REQUIRED",
         "LEARNING_CONTEXT_CHANGED",
+        "STUDENT_ARCHIVED",
       ].includes(error.code)
-    )
+    ) {
+      invalidateLearning();
       window.dispatchEvent(new Event("csf-session-invalid"));
+    }
     if (error.code === "PARENT_REAUTH_REQUIRED")
       window.dispatchEvent(new Event("csf-reauth-required"));
     if (error.code === "REVISION_CONFLICT")
@@ -81,6 +86,7 @@ export const post = <T>(path: string, body?: unknown) =>
     body: body ? JSON.stringify(body) : undefined,
   });
 export function announceSessionChange() {
+  invalidateLearning();
   const channel = new BroadcastChannel("csf-session");
   channel.postMessage("changed");
   channel.close();

@@ -9,6 +9,7 @@ from app.auth.dependencies import Identity, identity, session, verified_parent
 from app.curriculum.models import Subject, Textbook
 from app.curriculum.schemas import CurriculumUpdate, CurriculumView, SubjectView, TextbookList
 from app.curriculum.service import get_curriculum, update_curriculum
+from app.learning.authorization import learning_identity
 from app.students.router import Revision, expected_revision
 from app.students.service import authorized_student
 
@@ -49,7 +50,7 @@ async def curriculum(student_id: UUID, who: Parent, db: DB):
 
 
 @router.get("/learning/curriculum")
-async def learning_curriculum(db: DB, who: Annotated[Identity, Depends(identity)]):
+async def learning_curriculum(db: DB, who: Annotated[Identity, Depends(learning_identity)]):
     if who.auth_session.mode != "child":
         from app.errors import APIError
 

@@ -13,7 +13,7 @@ class Settings(BaseSettings):
 
     environment: str = "development"
     database_url: SecretStr
-    content_root: Path = API_ROOT.parents[1]
+    content_root: Path = API_ROOT.parent.parent
     public_origin: str = "http://localhost:3000"
     cookie_secure: bool = True
     bootstrap_admin_login: str | None = None
@@ -22,6 +22,8 @@ class Settings(BaseSettings):
     parent_verification_seconds: int = Field(default=300, ge=1)
     auth_rate_limit: int = Field(default=10, ge=1)
     auth_rate_window_seconds: int = Field(default=300, ge=1)
+    backup_retention_days: int = Field(default=0, ge=0, le=365)
+    deletion_journal: Path = API_ROOT / "private-content/deletions.jsonl"
 
     @field_validator("database_url")
     @classmethod

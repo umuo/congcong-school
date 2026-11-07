@@ -1,0 +1,56 @@
+name: congcong-cloud-test
+services:
+  postgres:
+    image: postgres:16@sha256:1beaa3084eee2676f20a9cd9928f0bf2c5bf674f8e49f81017912183d377c61c
+    environment:
+      POSTGRES_USER: csf_owner
+      POSTGRES_DB: csf_cloud
+      POSTGRES_PASSWORD: ${CSF_POSTGRES_PASSWORD:?Set an independent random owner password}
+    volumes:
+      - database:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U csf_owner -d csf_cloud"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+  api:
+    image: ${CSF_API_IMAGE:-congcong-cloud-api:test}
+    build:
+      context: ../..
+      dockerfile: deploy/cloud/api.Dockerfile
+    env_file: ${CSF_API_ENV_FILE:?Path to private runtime API environment file}
+    environment:
+      CSF_CONTENT_ROOT: /content
+      CSF_DELETION_JOURNAL: /private/deletions.jsonl
+      CSF_COOKIE_SECURE: "true"
+    volumes:
+      - ${CSF_CONTENT_ROOT:?Verified private resource checkout}/apps/web/public:/content/apps/web/public:ro
+      - ${CSF_PRIVATE_DIRECTORY:?Private persistent deletion journal directory}:/private
+    read_only: true
+    tmpfs: [/tmp]
+    depends_on:
+      postgres: {condition: service_healthy}
+    restart: unless-stopped
+  web:
+    image: ${CSF_CADDY_IMAGE:-caddy:2}
+    environment:
+      CSF_PUBLIC_HOST: ${CSF_PUBLIC_HOST:?Set the test hostname}
+      CSF_PUBLIC_ADDRESS: ${CSF_PUBLIC_ADDRESS:?Set hostname and HTTPS port}
+      CSF_HTTPS_PORT: ${CSF_HTTPS_PORT:-8443}
+    ports:
+      - "${CSF_HTTPS_BIND:-127.0.0.1}:80:80"
+      - "${CSF_HTTPS_BIND:-127.0.0.1}:${CSF_HTTPS_PORT:-8443}:${CSF_HTTPS_PORT:-8443}"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ${CSF_CLOUD_SITE:?Scanned cloud out directory}:/site:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    read_only: true
+    tmpfs: [/tmp]
+    depends_on: [api]
+    restart: unless-stopped
+volumes:
+  database:
+  caddy-data:
+  caddy-config:

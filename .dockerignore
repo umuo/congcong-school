@@ -33,3 +33,14 @@ output/*/knowledge
 output/_quizzes_backup
 release-assets
 deploy-output
+apps/api/private-content
+**/deletions.jsonl
+**/*.dump
+.aws
+.codex
+.ssh
+.tools
+.npm-cache
+.deployment
+.asset-cache
+**/*.env

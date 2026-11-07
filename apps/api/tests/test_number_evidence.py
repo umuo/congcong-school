@@ -33,6 +33,7 @@ async def finish_all(client, session, questions, hint_one=False):
         original = questions[public["id"]]
         if public["numberTask"]:
             assert public["numberTask"]["hints"] == []
+            assert public["numberTask"]["hint_count"] == 2
         if (
             hint_one
             and not requested

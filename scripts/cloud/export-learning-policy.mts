@@ -10,6 +10,7 @@ import {
 } from "../../packages/core/src/cosmetics";
 import { ALL_ACHIEVEMENTS } from "../../packages/core/src/achievements";
 import { QUEST_POOL } from "../../packages/core/src/quests";
+import { BOT_NAME_POOL, TIER_XP_RANGES, LEAGUE_TIERS, UNLOCK_LESSONS, LEAGUE_BOT_COUNT, PROMOTE_ZONE, DEMOTE_ZONE, RANK_GEM_REWARDS, PROMOTION_BONUS_GEMS } from "../../packages/core/src/league";
 import {
   NUMBER_LESSONS,
   NUMBER_SENSE_VERSION,
@@ -39,6 +40,7 @@ const files = [
   "achievements",
   "quests",
   "numberSense",
+  "league",
 ].map((name) => `packages/core/src/${name}.ts`);
 const source_hashes = Object.fromEntries(
   await Promise.all(
@@ -66,6 +68,7 @@ const policy = {
   quests: QUEST_POOL,
   number_lessons: NUMBER_LESSONS,
   number_version: NUMBER_SENSE_VERSION,
+  league: { names: BOT_NAME_POOL, ranges: TIER_XP_RANGES, tiers: LEAGUE_TIERS, unlock: UNLOCK_LESSONS, bot_count: LEAGUE_BOT_COUNT, promote: PROMOTE_ZONE, demote: DEMOTE_ZONE, rank_rewards: RANK_GEM_REWARDS, promotion_bonus: PROMOTION_BONUS_GEMS },
 };
 await writeFile(
   path.join(root, "apps/api/app/learning/policy.json"),

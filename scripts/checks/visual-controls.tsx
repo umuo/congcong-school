@@ -37,7 +37,7 @@ async function main() {
     sample("calculation"),
     sample("fill_blank_text", { answer: "山" }),
     sample("word_order", { options: ["I", "am", "Sam"], answer: "I am Sam" }),
-    sample("matching", { options: ["one—1", "two—2"], answer: "one—1;two—2" }),
+    sample("matching", { options: ["one", "two", "three", "four", "1", "2", "3", "4"], answer: "A-1,B-2,C-3,D-4" }),
     ...numberSenseQuestions("compare"),
   ];
   for (const question of questions) {
@@ -61,6 +61,27 @@ async function main() {
         !html.includes('role="button" tabindex'),
         "audio actions must be native keyboard-operable buttons",
       );
+    }
+    const saving = renderToStaticMarkup(<QuestionRenderer question={question} answer="" phase="answering" isCorrect={null} onChange={() => {}} locked />);
+    for (const button of saving.matchAll(/<button\b[^>]*>/g)) {
+      assert.match(button[0], /disabled=""/, `${question.type}: waiting controls must look disabled, rather than silently ignore the child's click`);
+    }
+  }
+  // Saving locks editing, but must never imply grading a partial answer.
+  for (const question of questions.filter(q => ["calculation", "fill_blank_text", "word_order"].includes(q.type))) {
+    const box = (phase: "answering" | "checked", locked: boolean, isCorrect: boolean | null) => {
+      const html = renderToStaticMarkup(<QuestionRenderer question={question} answer={question.type === "fill_blank_text" ? "y" : "1"} phase={phase} isCorrect={isCorrect} onChange={() => {}} locked inputKeyboard={{candidates:["y","o","u","r"],language:"letters",max_length:10}} />);
+      const match = html.match(/<div[^>]*class="([^"]*min-h-\[(?:68|64)px\][^"]*)"/);
+      assert.ok(match, `${question.type}: answer display exists`);
+      return match[1];
+    };
+    for (const locked of [false,true]) {
+      for (const result of [null,false,true]) {
+        assert.doesNotMatch(box("answering",locked,result), /border-(?:danger|primary)|bg-(?:danger|primary)\//, `${question.type}: typing/saving a partial answer stays neutral`);
+      }
+      assert.doesNotMatch(box("checked",locked,null), /border-(?:danger|primary)|bg-(?:danger|primary)\//, `${question.type}: an unknown result stays neutral`);
+      assert.match(box("checked",locked,true), /border-primary/);
+      assert.match(box("checked",locked,false), /border-danger/);
     }
   }
   const audio = renderToStaticMarkup(

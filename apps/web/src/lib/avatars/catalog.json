@@ -1,0 +1,70 @@
+{
+  "version": "avatars-1",
+  "default_id": "panda",
+  "presets": [
+    {
+      "id": "panda",
+      "name": "熊猫"
+    },
+    {
+      "id": "fox",
+      "name": "狐狸"
+    },
+    {
+      "id": "rabbit",
+      "name": "兔子"
+    },
+    {
+      "id": "bear",
+      "name": "小熊"
+    },
+    {
+      "id": "cat",
+      "name": "猫咪"
+    },
+    {
+      "id": "dog",
+      "name": "小狗"
+    },
+    {
+      "id": "tiger",
+      "name": "老虎"
+    },
+    {
+      "id": "lion",
+      "name": "狮子"
+    },
+    {
+      "id": "koala",
+      "name": "考拉"
+    },
+    {
+      "id": "penguin",
+      "name": "企鹅"
+    },
+    {
+      "id": "owl",
+      "name": "猫头鹰"
+    },
+    {
+      "id": "frog",
+      "name": "青蛙"
+    },
+    {
+      "id": "robot",
+      "name": "机器人"
+    },
+    {
+      "id": "astronaut",
+      "name": "宇航员"
+    },
+    {
+      "id": "star",
+      "name": "星星"
+    },
+    {
+      "id": "planet",
+      "name": "星球"
+    }
+  ]
+}

@@ -8,7 +8,19 @@ from pathlib import Path
 TEXT = {".html", ".txt", ".json", ".js", ".mjs", ".map", ".webmanifest"}
 PRIVATE_ROOTS = {"data", "audio", "story-images", "textbook-pages", "private-content"}
 BULK_QUESTIONS = re.compile(r"[\"\']?questions[\"\']?\s*:\s*\[")
-PRIVATE_PAIR = re.compile(r"\banswer\s*:[\s\S]{0,800}\bexplanation\s*:")
+PRIVATE_PAIR = re.compile(
+    r'''["']?\banswer["']?\s*:(?P<answer>[\s\S]{0,800}?)["']?\bexplanation["']?\s*:(?P<explanation>[^,}\n]{0,800})'''
+)
+# 组件可把已授权 API 响应映射到渲染器。拒绝内嵌的非空文字/数字/容器，
+# 不把 answer: session.feedback.answer 这样的运行时属性映射误当成静态题库。
+LITERAL = re.compile(r'''\s*(?:"[^"\n]+"|'[^'\n]+'|-?\d|true\b|false\b|\[|\{)''')
+
+
+def private_pair(text):
+    return any(
+        LITERAL.match(match["answer"]) or LITERAL.match(match["explanation"])
+        for match in PRIVATE_PAIR.finditer(text)
+    )
 
 
 def scan(root):
@@ -33,7 +45,7 @@ def scan(root):
         # RSC、HTML 内嵌 JSON 与 JS 字符串都可能对引号多次转义。
         for _ in range(3):
             text = text.replace('\\"', '"').replace("\\u0022", '"')
-        if BULK_QUESTIONS.search(text) or PRIVATE_PAIR.search(text):
+        if BULK_QUESTIONS.search(text) or private_pair(text):
             issues.append(f"{relative}: 发现私有题目数组或答案/解析结构")
     return {
         "status": "failed" if issues else "passed",

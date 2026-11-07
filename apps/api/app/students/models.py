@@ -12,6 +12,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column
 
+from app.avatars.catalog import DEFAULT_AVATAR
 from app.database import Base
 
 
@@ -26,7 +27,7 @@ class Student(Base):
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
     family_id: Mapped[UUID] = mapped_column(ForeignKey("families.id", ondelete="CASCADE"))
     nickname: Mapped[str] = mapped_column(String(80))
-    avatar: Mapped[str] = mapped_column(String(32), default="panda")
+    avatar: Mapped[str] = mapped_column(String(32), default=DEFAULT_AVATAR)
     birth_month: Mapped[str | None] = mapped_column(String(7))
     province: Mapped[str | None] = mapped_column(String(80))
     city: Mapped[str | None] = mapped_column(String(80))

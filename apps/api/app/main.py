@@ -12,11 +12,14 @@ from starlette.exceptions import HTTPException
 
 from app.admin.router import router as admin_router
 from app.auth.router import router as auth_router
+from app.avatars.router import router as avatar_router
 from app.config import API_ROOT, Settings, get_settings
 from app.content.router import router as content_router
 from app.curriculum.router import router as curriculum_router
 from app.database import Database
+from app.diagnostics.router import router as diagnostics_router
 from app.learning.router import router as learning_router
+from app.portability.router import router as portability_router
 from app.students.router import router as student_router
 
 
@@ -34,11 +37,14 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.database = database
     app.state.settings = settings
     app.include_router(auth_router)
+    app.include_router(avatar_router)
     app.include_router(admin_router)
     app.include_router(student_router)
     app.include_router(curriculum_router)
     app.include_router(content_router)
     app.include_router(learning_router)
+    app.include_router(diagnostics_router)
+    app.include_router(portability_router)
 
     @app.exception_handler(HTTPException)
     async def http_error(request: Request, exc: HTTPException):

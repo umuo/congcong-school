@@ -60,6 +60,14 @@ export async function followPassage(sentences: readonly Sentence[], io: Playback
 export function recordingForSession(recorder: { start: () => Promise<boolean>; stop: () => Promise<string | null> }, isCurrent: () => boolean) {
   return {
     start: () => isCurrent() ? recorder.start() : Promise.resolve(false),
-    stop: () => isCurrent() ? recorder.stop() : Promise.resolve(null),
+    stop: async () => {
+      if (!isCurrent()) return null;
+      const url = await recorder.stop();
+      if (!isCurrent()) {
+        if (url) URL.revokeObjectURL(url);
+        return null;
+      }
+      return url;
+    },
   };
 }

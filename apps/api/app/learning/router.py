@@ -1,7 +1,9 @@
 from typing import Annotated
 from uuid import UUID
+from zoneinfo import ZoneInfo
 
 from fastapi import APIRouter, Depends, Header, Query, Request
+from fastapi.responses import FileResponse
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -10,16 +12,20 @@ from app.content.schemas import public_question
 from app.content.service import fixed_question
 from app.families.models import Family
 from app.learning import economy as economy_rules
+from app.learning import league
 from app.learning.activity import rebuild, submit_time
 from app.learning.authorization import learning_identity
 from app.learning.economy_service import action, clock, complete, load_state, progress_view
-from app.learning.models import EconomyState, LearningEvent
+from app.learning.media import authorized_media, session_content
+from app.learning.models import EconomyState, LearningEvent, LearningSession
 from app.learning.review import review_bank
 from app.learning.schemas import (
     AnswerBody,
     CompleteBody,
     DraftBody,
     EconomyAction,
+    MatchingPairBody,
+    MatchingPairView,
     PublicQuestion,
     RevisionBody,
     SessionView,
@@ -29,6 +35,7 @@ from app.learning.schemas import (
 from app.learning.service import (
     authorized_session,
     change_checkpoint,
+    check_matching_pair,
     learning_student,
     start,
     submit,
@@ -47,15 +54,77 @@ async def start_session(student_id: UUID, body: StartSession, key: Key, db: DB, 
     return await start(db, who, student_id, body, key)
 
 
+@router.get("/students/{student_id}/learning-sessions")
+async def active_sessions(
+    student_id: UUID,
+    db: DB,
+    who: Auth,
+    kind: str | None = None,
+    book_id: str | None = None,
+    source_id: str | None = None,
+    target_unit: int | None = None,
+    number_skill: str | None = None,
+    reading_kind: str | None = None,
+    for_hearts: bool = False,
+):
+    await learning_student(db, who, student_id)
+    statement = select(LearningSession).where(
+        LearningSession.student_id == student_id, LearningSession.status == "active"
+    )
+    for field, value in [("kind", kind), ("book_id", book_id), ("source_id", source_id)]:
+        if value is not None:
+            statement = statement.where(getattr(LearningSession, field) == value)
+    rows = (
+        await db.scalars(statement.order_by(LearningSession.created_at.desc()).limit(100))
+    ).all()
+    return [
+        {
+            "id": str(row.id),
+            "kind": row.kind,
+            "book_id": row.book_id,
+            "source_id": row.source_id,
+            "created_at": row.created_at,
+        }
+        for row in rows
+        if (target_unit is None or row.checkpoint.get("target_unit") == target_unit)
+        and (number_skill is None or row.checkpoint.get("number_skill") == number_skill)
+        and (reading_kind is None or row.checkpoint.get("reading_kind") == reading_kind)
+        and bool(row.checkpoint.get("for_hearts", False)) == for_hearts
+    ]
+
+
 @router.get("/learning-sessions/{session_id}", response_model=SessionView)
 async def get_session(session_id: UUID, db: DB, who: Auth):
     student, row = await authorized_session(db, who, session_id)
     return await view(db, row, student)
 
 
+@router.get("/learning-sessions/{session_id}/content")
+async def get_session_content(session_id: UUID, db: DB, who: Auth):
+    _, row = await authorized_session(db, who, session_id)
+    return await session_content(db, row)
+
+
+@router.get("/learning-sessions/{session_id}/media")
+async def get_session_media(session_id: UUID, request: Request, db: DB, who: Auth, path: str):
+    student, row = await authorized_session(db, who, session_id)
+    target = await authorized_media(
+        db, student, row, request.app.state.settings.content_root / "apps/web/public", path
+    )
+    await db.rollback()  # 不在音频播放期间持有学生行锁。
+    return FileResponse(
+        target, headers={"Cache-Control": "no-store", "X-Content-Type-Options": "nosniff"}
+    )
+
+
 @router.post("/learning-sessions/{session_id}/attempts", response_model=SessionView)
 async def answer(session_id: UUID, body: AnswerBody, key: Key, db: DB, who: Auth):
     return await submit(db, who, session_id, body, key)
+
+
+@router.post("/learning-sessions/{session_id}/matching-pairs", response_model=MatchingPairView)
+async def matching_pair(session_id: UUID, body: MatchingPairBody, key: Key, db: DB, who: Auth):
+    return await check_matching_pair(db, who, session_id, body, key)
 
 
 @router.post("/learning-sessions/{session_id}/advance", response_model=SessionView)
@@ -131,6 +200,17 @@ async def get_progress(student_id: UUID, request: Request, db: DB, who: Auth):
 @router.get("/learning/shop")
 async def shop(who: Auth):
     return {"version": economy_rules.VERSION, "items": economy_rules.POLICY["cosmetics"]}
+
+
+@router.get("/students/{student_id}/league")
+async def get_league(student_id: UUID, request: Request, db: DB, who: Auth):
+    student = await read_student(student_id, request, db, who)
+    _, state = await load_state(db, student)
+    now, _ = await clock(db, student)
+    family = await db.get(Family, student.family_id)
+    return league.standings(
+        state, now.astimezone(ZoneInfo(family.timezone)), student.id, student.avatar
+    )
 
 
 async def read_student(student_id, request, db, who):

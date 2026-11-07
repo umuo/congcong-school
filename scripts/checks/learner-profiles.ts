@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import ts from 'typescript';
+import { normalize } from 'node:path';
 const require = createRequire(import.meta.url);
 function memory() {
   const data = new Map<string,string>();
@@ -18,7 +19,7 @@ function tab(session: ReturnType<typeof memory>) {
     const code=ts.transpileModule(readFileSync(path,'utf8'),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.CommonJS}}).outputText;
     const resolve=(id:string):any=>{
       if(id.startsWith('@/'))return load(`apps/web/src/${id.slice(2)}.ts`);
-      if(id.startsWith('./'))return load(`${path.slice(0,path.lastIndexOf('/'))}/${id.slice(2)}.ts`);
+      if(id.startsWith('.'))return load(normalize(`${path.slice(0,path.lastIndexOf('/'))}/${id}.ts`));
       return require(id);
     };
     new Function('exports','require','window','localStorage','sessionStorage',code)(exports,resolve,window,storage,session);
@@ -95,6 +96,15 @@ for (const edition of revisions) {
 }
 console.log('PASS latest-main learner profiles: actual v13 store, migration, independent progress/rewards/achievements/settings, reading/review/number-sense sessions, reload, theme boot and tab isolation.');
 console.log(`PASS: ${revisions.length} revised editions retain legacy grades and active book through reload; new completion and perfect rewards stay independent.`);
+const localClient = (back.load('apps/web/src/lib/learning/local.ts') as typeof import('../../apps/web/src/lib/learning/local')).createLocalLearningClient();
+assert.equal(localClient.mode, 'local');
+assert.equal(localClient.scope.studentId, back.manager.activeId);
+const gemsBefore = back.store.getState().gems;
+localClient.run(state => state.addGems(1));
+assert.equal(back.store.getState().gems, gemsBefore + 1);
+localClient.dispose();
+assert.throws(() => localClient.run(state => state.addGems(100)));
+console.log('PASS: local LearningClient preserves v13 store semantics and rejects writes after disposal.');
 // Parallel five-four books share a grade/subject with six-three books but never
 // share their progress identities or implicitly replace an explicit selection.
 const fiveFour = JSON.parse(readFileSync('docs/five-four-2026-10-27/source-review.json', 'utf8')).books as {id: string}[];

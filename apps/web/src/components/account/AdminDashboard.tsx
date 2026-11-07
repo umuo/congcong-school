@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState, type FormEvent } from "react";
-import { api, post } from "@/lib/api/client";
+import { api, post, type Account } from "@/lib/api/client";
 import { Field, Message } from "./AccountShell";
 import { PasswordFields } from "./PasswordFields";
 import { LoginNameField } from "./LoginNameField";
@@ -17,7 +17,7 @@ type ManagedUser = {
 type Family = { id: string; name: string };
 type Profile = { id: string; nickname: string; archived: boolean };
 
-export function AdminDashboard() {
+export function AdminDashboard({account}: {account: Account}) {
   const [kind, setKind] = useState<"parents" | "students">("parents");
   const [users, setUsers] = useState<ManagedUser[]>([]);
   const [families, setFamilies] = useState<Family[]>([]);
@@ -28,24 +28,27 @@ export function AdminDashboard() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [version, setVersion] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [loadFailed, setLoadFailed] = useState(false);
   const [action, setAction] = useState<{
     user: ManagedUser;
     type: "disable" | "reset-password";
   } | null>(null);
   useEffect(() => {
     const controller = new AbortController();
-    setUsers([]);
+    setUsers([]); setLoading(true); setLoadFailed(false); setError("");
     void Promise.all([
       api<ManagedUser[]>(`/admin/${kind}`, { signal: controller.signal }),
       api<Family[]>("/admin/families", { signal: controller.signal }),
     ])
       .then(([u, f]) => {
+        if (controller.signal.aborted) return;
         setUsers(u);
         setFamilies(f);
       })
       .catch((e) => {
-        if (!controller.signal.aborted) setError(e.message);
-      });
+        if (!controller.signal.aborted) { setError(e.message); setLoadFailed(true); }
+      }).finally(() => { if (!controller.signal.aborted) setLoading(false); });
     return () => controller.abort();
   }, [kind, version]);
   useEffect(() => {
@@ -57,7 +60,7 @@ export function AdminDashboard() {
         `/admin/student-profiles?family_id=${encodeURIComponent(family)}`,
         { signal: controller.signal },
       )
-        .then(setProfiles)
+        .then(value => { if (!controller.signal.aborted) setProfiles(value); })
         .catch((e) => {
           if (!controller.signal.aborted) setError(e.message);
         });
@@ -239,7 +242,7 @@ export function AdminDashboard() {
         <section className="account-card">
           <h2>{kind === "parents" ? "家长" : "学生"}账号列表</h2>
           <div className="account-list">
-            {users.length ? (
+            {loading ? <p role="status">正在读取账号列表…</p> : loadFailed ? <div><p>账号列表暂时没能读到，请重新连接。</p><button className="secondary" onClick={()=>setVersion(v=>v+1)}>重新读取账号</button></div> : users.length ? (
               users.map((u) => (
                 <article key={u.id} className="account-row">
                   <div>

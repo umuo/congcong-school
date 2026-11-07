@@ -15,7 +15,7 @@
  *   - 键盘：1-4 选左列，5-8 选右列（桌面端角标提示）
  */
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/cn";
 import { QuestionPrompt } from "./QuestionPrompt";
@@ -41,8 +41,9 @@ export function MatchingQuestion({
   isCorrect,
   onChange,
   locked = false,
+  remoteMatching,
 }: QuestionRendererProps) {
-  const disabled = phase === "checked";
+  const disabled = locked || phase === "checked";
   const options = question.options ?? [];
   const cancelNarrate = useAutoNarrate([question.audio?.question], question.id);
   const left = options.slice(0, 4);
@@ -62,7 +63,8 @@ export function MatchingQuestion({
   }, [question.answer]);
 
   /** 已配对成功（消失）的左键集合 */
-  const matched = useMemo(() => matchingPairs(question, answer), [question, answer]);
+  const matched = useMemo(() => remoteMatching?.pairs ?? matchingPairs(question, answer), [remoteMatching, question, answer]);
+  const pairPending = useRef(false);
   /** 正在播「绿闪」即将消失的一对 */
   const [vanishing, setVanishing] = useState<{ l: LeftKey; r: RightKey } | null>(null);
   /** 刚配错正在「红抖」的一对（key 用于重播动画） */
@@ -89,7 +91,7 @@ export function MatchingQuestion({
   }
 
   function pickLeft(k: LeftKey) {
-    if (locked || disabled || matched[k] || vanishing) return;
+    if (locked || disabled || pairPending.current || matched[k] || vanishing) return;
     cancelNarrate();
     playSfx("tap");
     haptic("light");
@@ -97,8 +99,8 @@ export function MatchingQuestion({
     setActiveLeft(activeLeft === k ? null : k);
   }
 
-  function pickRight(rk: RightKey) {
-    if (locked || disabled || vanishing) return;
+  async function pickRight(rk: RightKey) {
+    if (locked || disabled || pairPending.current || vanishing) return;
     if (activeLeft === null) return;
     if (Object.values(matched).includes(rk)) return;
     cancelNarrate();
@@ -106,7 +108,15 @@ export function MatchingQuestion({
     const l = activeLeft;
     setActiveLeft(null);
 
-    if (answerMap[l] === rk) {
+    let correct: boolean;
+    try {
+      pairPending.current = true;
+      correct = remoteMatching ? await remoteMatching.checkPair(l, rk) : answerMap[l] === rk;
+    } catch {
+      // 云端父组件保留原键并展示网络/权限错误，不能据此播放答错反馈。
+      return;
+    } finally { pairPending.current = false; }
+    if (correct) {
       // ✅ 配对正确：绿闪 → 双双消失
       playSfx("correct", { volume: 0.55 });
       haptic("light");
@@ -151,7 +161,7 @@ export function MatchingQuestion({
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full" data-sound-handled>
       <QuestionPrompt text={question.question} audio={question.audio?.question} locked={locked} />
 
       <p className="text-sm text-ink-light mb-4">先选左侧，再选右侧，找到对应的一对。</p>

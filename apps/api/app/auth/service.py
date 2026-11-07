@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.auth.adapters import TokenDatabase, strategy, user_manager
 from app.auth.dependencies import CSRF_COOKIE, SESSION_COOKIE
 from app.auth.models import AuthRateLimit, AuthSession, StudentAccount, User
+from app.avatars.catalog import DEFAULT_AVATAR
 from app.errors import APIError
 from app.families.models import Family, Membership
 
@@ -59,6 +60,8 @@ async def create_account(
         hashed_password=user_manager(db).password_helper.hash(password),
         nickname=nickname,
         role=role,
+        avatar=DEFAULT_AVATAR if role != "student" else None,
+        avatar_revision=1 if role != "student" else None,
         must_change_password=(role == "admin")
         if must_change_password is None
         else must_change_password,

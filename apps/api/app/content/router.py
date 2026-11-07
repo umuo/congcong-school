@@ -1,17 +1,29 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Request
+from fastapi.responses import FileResponse
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.dependencies import Identity, identity, session
+from app.content.media import media_paths, resolve_media_path
 from app.content.models import ContentContainer, ContentRevision
 from app.content.schemas import ContentKind, ContentView
 from app.content.service import content_revision, content_view, jump_pool, resolve_question
+from app.learning.authorization import learning_identity
+from app.students.service import authorized_student
 
-router = APIRouter(prefix="/api/v1/content", dependencies=[Depends(identity)])
 DB = Annotated[AsyncSession, Depends(session)]
 Auth = Annotated[Identity, Depends(identity)]
+
+
+async def content_identity(db: DB, who: Annotated[Identity, Depends(learning_identity)]):
+    if who.auth_session.mode == "child":
+        await authorized_student(db, who, who.auth_session.student_id, for_learning=True)
+    return who
+
+
+router = APIRouter(prefix="/api/v1/content", dependencies=[Depends(content_identity)])
 
 
 @router.get("/books/{book_id}")
@@ -70,3 +82,18 @@ async def get_content(
 ):
     head, revision = await content_revision(db, book_id, kind, source_id, version)
     return content_view(head, revision)
+
+
+@router.get("/books/{book_id}/{kind}/{source_id}/media")
+async def get_content_media(
+    book_id: str, kind: ContentKind, source_id: str, path: str, request: Request, db: DB
+):
+    _, revision = await content_revision(db, book_id, kind, source_id)
+    target = resolve_media_path(
+        request.app.state.settings.content_root / "apps/web/public",
+        path,
+        media_paths(revision.public_payload),
+    )
+    return FileResponse(
+        target, headers={"Cache-Control": "no-store", "X-Content-Type-Options": "nosniff"}
+    )

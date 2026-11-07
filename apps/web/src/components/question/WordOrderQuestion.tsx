@@ -33,7 +33,7 @@ export function WordOrderQuestion({
   onChange,
   locked = false,
 }: QuestionRendererProps) {
-  const disabled = phase === "checked";
+  const disabled = locked || phase === "checked";
   const options = question.options ?? [];
   const cancelNarrate = useAutoNarrate([question.audio?.question], question.id);
 
@@ -70,14 +70,14 @@ export function WordOrderQuestion({
   const correctSeq = phase === "checked" ? question.answer.split(",").map(s => s.trim()) : [];
 
   return (
-    <div className="w-full">
+    <div className="w-full" data-sound-handled>
       <QuestionPrompt text={question.question} audio={question.audio?.question} locked={locked} />
 
       {/* 已选区 */}
       <div
         className={cn(
           "min-h-[64px] rounded-2xl border-2 border-dashed p-3 flex flex-wrap gap-2 mb-4 transition-colors",
-          disabled
+          phase === "checked" && isCorrect !== null
             ? isCorrect
               ? "border-primary bg-primary/15"
               : "border-danger bg-danger/10"
@@ -136,7 +136,7 @@ export function WordOrderQuestion({
       </div>
 
       {/* 错误时显示正确答案 */}
-      {phase === "checked" && !isCorrect && (
+      {phase === "checked" && isCorrect === false && (
         <motion.div
           initial={{ y: 6, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}

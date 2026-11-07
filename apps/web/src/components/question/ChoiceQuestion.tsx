@@ -82,7 +82,7 @@ export function ChoiceQuestion({
 
   const hasOptionAudio = question.audio?.options?.some(Boolean);
   return (
-    <div className="w-full">
+    <div className="w-full" data-sound-handled>
       {!hidePrompt && <QuestionPrompt text={question.question} audio={question.audio?.question} locked={locked} />}
 
       <div className="space-y-3">

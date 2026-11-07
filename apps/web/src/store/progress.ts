@@ -1,6 +1,7 @@
 "use client";
 
 import { learnerLocalStorage, learnerSessionStorage } from "@/lib/learnerProfiles";
+import { setAudioPreferences, setMascotSkin } from "@/lib/learning/preferences";
 import { saveReviewSession } from "@/lib/reviewSession";
 import { numberSkillForLesson, recordNumberPractice, recordNumberReview, dueNumberSkills, normalizeNumberProgress, type NumberProgress, type NumberPracticeEvidence, type NumberSkill } from '@cstf/core/numberSense';
 import { create } from "zustand";
@@ -1868,3 +1869,11 @@ export const useProgressStore = create<ProgressState>()(
     },
   ),
 );
+
+// UI 音频偏好供共用题型读取；云端题型无需加载本地权威 store。
+setAudioPreferences(useProgressStore.getState());
+setMascotSkin(useProgressStore.getState().equippedMascotSkin);
+useProgressStore.subscribe((state) => {
+  setAudioPreferences(state);
+  setMascotSkin(state.equippedMascotSkin);
+});

@@ -22,6 +22,12 @@ async def test_context_is_stable_rotates_and_rejects_old_pending_requests(auth_a
         child_scope = child["context_id"]
         assert child_scope != parent_scope and child["user"] is None
         assert not {"token", "csrf_hash", "hashed_password"} & child.keys()
+        for route in ["/content/books/g1up", "/learning/profile", "/learning/curriculum"]:
+            assert (
+                await client.get(
+                    "/api/v1" + route, headers={"X-CSF-Learning-Context": parent_scope}
+                )
+            ).status_code == 409
         assert (
             await client.get(
                 f"/api/v1/students/{first['id']}/progress",

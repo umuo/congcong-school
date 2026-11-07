@@ -5,12 +5,16 @@ import { FillBlankTextQuestion } from '../../apps/web/src/components/question/Fi
 import { gradeAnswer } from '../../apps/web/src/lib/grade';
 import type { Question } from '../../apps/web/src/types';
 
-for (const answer of ['thirty-first', 'in the library', 'didnt watch', '一百二十三']) {
+for (const answer of ['thirty-first', 'in the library', 'didnt watch', "I'm Tom.", '一百二十三']) {
   const question = { id: 19, type: 'fill_blank_text', question: 'Fill in', answer, options: [], score: 1, difficulty: 1, knowledge_point: '', explanation: '' } as Question;
   const html = renderToStaticMarkup(<FillBlankTextQuestion question={question} answer="" phase="answering" isCorrect={null} onChange={() => {}} />);
   const keys = new Set((html.match(/<button\b[\s\S]*?<\/button>/g) ?? []).map(button => button.replace(/<[^>]+>/g, '')));
-  const typed = answer.toLowerCase().replace(/\s+/g, '');
+  const typed = answer.toLowerCase().replace(/[\s'.,!?:;]/g, '');
   for (const ch of typed) assert.ok(keys.has(ch), `Keyboard cannot enter ${ch} in ${answer}`);
   assert.ok(gradeAnswer(question, typed));
+  if (/[a-z]/i.test(answer)) {
+    assert.ok(html.includes("点下方字母作答"));
+    assert.ok(!/[\u4e00-\u9fff]/.test([...keys].filter(key => key !== "⌫").join("")));
+  }
 }
 console.log('Text keyboards expose every character needed for long and compound answers.');

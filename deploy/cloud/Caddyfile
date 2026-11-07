@@ -1,0 +1,54 @@
+{
+	admin off
+	servers :{$CSF_HTTPS_PORT:8443} {
+		listener_wrappers {
+			http_redirect
+			tls
+		}
+	}
+}
+
+https://{$CSF_PUBLIC_ADDRESS} {
+	tls {
+		issuer acme {
+			disable_tlsalpn_challenge
+		}
+	}
+	encode zstd gzip
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		Cache-Control "no-store"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "same-origin"
+		-Server
+	}
+	request_body {
+		max_size 6MB
+	}
+	@private path /data /data/* /audio /audio/* /story-images /story-images/* /textbook-pages /textbook-pages/* /private-content /private-content/*
+	handle @private {
+		respond 404
+	}
+	handle /api/* {
+		reverse_proxy {$CSF_API_ADDRESS:api:8000}
+	}
+	handle /healthz {
+		respond "ok" 200
+	}
+	handle /sw.js {
+		header Content-Type application/javascript
+		respond `self.addEventListener('install',e=>e.waitUntil(self.skipWaiting()));self.addEventListener('activate',e=>e.waitUntil((async()=>{for(const k of await caches.keys())if(k.startsWith('ctsf-'))await caches.delete(k);await self.registration.unregister();for(const c of await self.clients.matchAll({type:'window'}))c.navigate(c.url);})()));` 200
+	}
+	handle /service-worker.js {
+		respond 410
+	}
+	handle {
+		root * /site
+		try_files {path} {path}/index.html
+		file_server
+	}
+}
+
+http://{$CSF_PUBLIC_HOST}, http://:80 {
+	redir https://{$CSF_PUBLIC_ADDRESS}{uri} 308
+}

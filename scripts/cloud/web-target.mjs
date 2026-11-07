@@ -13,6 +13,8 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { spawn } from "node:child_process";
 
+await import("./export-avatar-catalog.mjs");
+
 const root = fileURLToPath(new URL("../../", import.meta.url));
 const web = path.join(root, "apps/web");
 const action = process.argv[2];
@@ -73,9 +75,10 @@ if (mode === "local") {
     "manifest.ts",
     "icon.svg",
   ]) {
-    await symlink(
+    await cp(
       path.join(web, "src/app", name),
       path.join(stage, "src/app", name),
+      { recursive: true },
     );
   }
 }
@@ -87,6 +90,7 @@ if (mode === "local" && action === "dev") {
     recursive: true,
   });
 }
+if (!(mode === "local" && action === "dev")) await cp(path.join(web, "public/forest"), path.join(stage, "public/forest"), { recursive: true });
 const env = {
   ...process.env,
   NEXT_PUBLIC_APP_MODE: mode,

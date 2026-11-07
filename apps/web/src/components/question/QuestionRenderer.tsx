@@ -32,7 +32,13 @@ export interface QuestionRendererProps {
   visualDraft?: number[];
   onVisualDraft?: (ids: number[]) => void;
   hintLevel?: number;
+  hintLimit?: number;
   onHint?: () => void;
+  inputKeyboard?: { candidates: string[]; language: "letters" | "text"; max_length: number };
+  remoteMatching?: {
+    pairs: Partial<Record<string, string>>;
+    checkPair: (left: string, right: string) => Promise<boolean>;
+  };
 }
 
 export function QuestionRenderer(props: QuestionRendererProps) {

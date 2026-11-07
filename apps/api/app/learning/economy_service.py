@@ -12,6 +12,7 @@ from app.curriculum.models import Textbook
 from app.errors import APIError
 from app.families.models import Family
 from app.learning import economy as rules
+from app.learning import league
 from app.learning.models import Attempt, EconomyState, RewardClaim, RewardLedger
 from app.learning.review import review_bank
 from app.learning.transactions import append_event, receipt, save_receipt
@@ -429,7 +430,11 @@ async def action(db, student, body, key):
     before_gems = state["gems"]
     claims = []
     result = {"kind": body.kind, "applied": False}
-    if body.kind == "daily_reward":
+    if body.kind == "league":
+        settlement, league_claims = league.settle(state, today)
+        result.update(applied=settlement is not None, settlement=settlement)
+        claims.extend(league_claims)
+    elif body.kind == "daily_reward":
         if state["lastDailyRewardDate"] != day:
             effective = rules.effective_streak(state, today)
             rules.add_gems(state, rules.daily_reward(effective))

@@ -38,6 +38,17 @@ async function main() {
   assert.equal(await oldRun, 'cancelled');
   assert.equal(active, true, 'The obsolete loop must not stop the newer recording');
   assert.equal(stopCount, 1, 'Only the explicit user cancellation may stop this recorder');
+  const revoked: string[]=[];
+  const revoke=URL.revokeObjectURL;
+  let finishStop!: (url:string)=>void;
+  let current=true;
+  try {
+    URL.revokeObjectURL=(url:string)=>{revoked.push(url);};
+    const recording=recordingForSession({start:async()=>true,stop:()=>new Promise(resolve=>{finishStop=resolve;})},()=>current);
+    const stopped=recording.stop();current=false;finishStop('blob:retired-recording');
+    assert.equal(await stopped,null);
+    assert.deepEqual(revoked,['blob:retired-recording'],'Late recording URLs must be revoked after switching runs');
+  } finally { URL.revokeObjectURL=revoke; }
   console.log('Reading completion rejects audio failure, permission denial, empty recording and cancellation.');
 }
 void main();

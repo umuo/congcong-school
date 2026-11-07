@@ -3,7 +3,7 @@
 import { motion, useAnimation, useReducedMotion } from "framer-motion";
 import { useEffect, useId, useState } from "react";
 import { MascotSkinOverlay } from "./MascotSkinOverlay";
-import { useProgressStore } from "@/store/progress";
+import { useAudioPreferences, useMascotSkin } from "@/lib/learning/preferences";
 import type { MascotMood, MascotReaction } from "@cstf/core";
 
 export type { MascotMood, MascotReaction };
@@ -41,13 +41,14 @@ export function Mascot({
   const id = "panda-" + useId().replace(/[^a-zA-Z0-9_-]/g, "");
   const paint = (name: string) => "url(#" + id + "-" + name + ")";
   const reducedMotion = useReducedMotion();
-  const canAnimate = animate && !reducedMotion;
+  const preferences = useAudioPreferences();
+  const canAnimate = animate && !reducedMotion && !preferences.reducedMotion;
   const reaction = useAnimation();
   const arm = useAnimation();
   const [blink, setBlink] = useState(false);
   const [sweat, setSweat] = useState(false);
   const [glow, setGlow] = useState(false);
-  const equippedSkin = useProgressStore(s => s.equippedMascotSkin);
+  const equippedSkin = useMascotSkin();
   const skinId = skinOverride !== undefined ? skinOverride : equippedSkin;
 
   useEffect(() => {

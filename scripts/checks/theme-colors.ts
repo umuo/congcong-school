@@ -29,3 +29,6 @@ assert.equal(brand['--action-primary-edge'], '#58A700');
 assert.equal(brand['--action-accent-bg'], '#1CB0F6');
 assert.equal(brand['--action-accent-edge'], '#1899D6');
 console.log('PASS: exact brand fills and edges; action labels and small text meet 4.5:1 across all 10 themes and both modes.');
+
+for (const [ink,paper] of [["#284d3b","#fffdf5"],["#506452","#f7f7e9"],["#ffffff","#517c2c"],["#284d3b","#edf4df"],["#285e9d","#fffdf5"]]) assert.ok(ratio(ink,paper)>=4.5,`forest contrast ${ink} on ${paper}`);
+console.log("PASS forest default labels, surfaces, primary and focus contrast >=4.5:1.");

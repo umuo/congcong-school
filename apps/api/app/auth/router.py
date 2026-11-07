@@ -32,6 +32,7 @@ from app.auth.schemas import (
     UserView,
 )
 from app.errors import APIError
+from app.learning.authorization import learning_identity
 from app.students.models import Student
 from app.students.service import authorized_student
 
@@ -183,7 +184,7 @@ async def reauth(
 
 
 @router.get("/learning/profile", response_model=ChildProfileView)
-async def learning_profile(who: Auth, db: DB):
+async def learning_profile(who: Annotated[Identity, Depends(learning_identity)], db: DB):
     if who.auth_session.mode != "child":
         raise APIError(403, "CHILD_MODE_REQUIRED", "请先选择孩子学习档案")
     student = await authorized_student(db, who, who.auth_session.student_id, for_learning=True)

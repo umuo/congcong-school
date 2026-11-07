@@ -19,8 +19,9 @@
  */
 
 import { useCallback, useEffect, useRef } from "react";
+import { isMuted } from "./sfx";
 import { playTTS, stopTTS } from "./tts";
-import { useProgressStore } from "@/store/progress";
+import { useAudioPreferences } from "./learning/preferences";
 
 interface Opts {
   /** 段间间隔，默认 200ms */
@@ -39,8 +40,8 @@ export function useAutoNarrate(
   opts: Opts = {},
 ): () => void {
   const { gapMs = 200, startDelayMs = 0, onSrcStart, onAllDone } = opts;
-  const autoNarrate = useProgressStore(s => s.autoNarrate);
-  const muted = useProgressStore(s => s.muted);
+  const { autoNarrate } = useAudioPreferences();
+  const muted = isMuted();
 
   // 用 ref 持有 srcs / 回调，避免引用变化造成 effect 反复重跑；
   // 触发重播只依赖语义 key / 开关。

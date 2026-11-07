@@ -53,7 +53,9 @@ async def get_student(student_id: UUID, who: Parent, db: DB):
 async def update_student(
     student_id: UUID, body: StudentUpdate, who: Parent, db: DB, if_match: Revision = None
 ):
-    student = await authorized_student(db, who, student_id)
+    student = await authorized_student(db, who, student_id, lock=True)
+    if "avatar" in body.model_fields_set and student.archived_at:
+        raise APIError(409, "STUDENT_ARCHIVED", "归档档案的头像只读")
     revision = expected_revision(if_match)
     result = await db.execute(
         update(Student)

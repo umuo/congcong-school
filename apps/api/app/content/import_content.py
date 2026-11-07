@@ -291,6 +291,9 @@ async def import_content(db, root):
                 set_={"current_version": statement.excluded.current_version, "active": True},
             )
         )
+    from app.diagnostics.catalog_builder import sync_knowledge_catalog
+
+    await sync_knowledge_catalog(db, root)
     await db.commit()
     return batch.summary()
 

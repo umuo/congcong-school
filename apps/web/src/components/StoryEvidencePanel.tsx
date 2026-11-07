@@ -12,7 +12,7 @@ export function StoryEvidencePanel({
   onSelect,
   onPlay,
 }: {
-  story: Story;
+  story: Pick<Story, "title" | "sentences">;
   selected: number[];
   reference: number[];
   checked: boolean;

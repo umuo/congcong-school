@@ -1,7 +1,15 @@
 "use client";
 import { useState, type FormEvent } from "react";
+import { Avatar } from "@/components/avatars/Avatar";
+import { AvatarChoices } from "@/components/avatars/AvatarPicker";
+import { notifyAvatarUpdated } from "@/lib/avatars/client";
 import { api } from "@/lib/api/client";
-import { Field, Message } from "./AccountShell";
+import {
+  Field,
+  FloatingToast,
+  InfoPopover,
+  type ToastTone,
+} from "./AccountShell";
 
 export interface Student {
   id: string;
@@ -20,25 +28,35 @@ export interface Student {
   archived_at: string | null;
   revision: number;
 }
+
 export function StudentForm({
   student,
   onSave,
   onCancel,
+  embedded = false,
 }: {
   student?: Student;
   onSave: (s: Student) => void;
-  onCancel: () => void;
+  onCancel?: () => void;
+  embedded?: boolean;
 }) {
-  const [busy, setBusy] = useState(false),
-    [error, setError] = useState("");
+  const [avatar, setAvatar] = useState(student?.avatar ?? "panda");
+  const [busy, setBusy] = useState(false);
+  const [toast, setToast] = useState<{ text: string; tone: ToastTone }>({
+    text: "",
+    tone: "info",
+  });
+
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setBusy(true);
-    setError("");
-    const data = new FormData(event.currentTarget),
-      body: Record<string, unknown> = {};
-    for (const [key, value] of data.entries())
+    setToast({ text: "", tone: "info" });
+    const data = new FormData(event.currentTarget);
+    const body: Record<string, unknown> = {};
+    for (const [key, value] of data.entries()) {
       body[key] = value === "" ? null : value;
+    }
+    body.avatar = avatar;
     body.grade = Number(data.get("grade"));
     body.daily_goal_minutes = Number(data.get("daily_goal_minutes"));
     try {
@@ -50,19 +68,49 @@ export function StudentForm({
           headers: student ? { "If-Match": String(student.revision) } : {},
         },
       );
+      notifyAvatarUpdated({
+        scope_kind: "student",
+        subject_id: value.id,
+        avatar_id: value.avatar,
+        revision: value.revision,
+        catalog_version: "avatars-1",
+      });
+      setToast({
+        text: student
+          ? `${value.nickname}的档案已保存。`
+          : `已创建 ${value.nickname} 的档案。`,
+        tone: "success",
+      });
       onSave(value);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "保存失败");
+      setToast({
+        text: e instanceof Error ? e.message : "保存失败",
+        tone: "error",
+      });
     } finally {
       setBusy(false);
     }
   }
-  return (
-    <section className="account-card">
-      <h2>{student ? `编辑${student.nickname}的档案` : "添加孩子档案"}</h2>
-      <p className="account-hint">
-        出生年月、学校和备注均为选填。开通独立登录账号请联系管理员。
-      </p>
+
+  const content = (
+    <>
+      <FloatingToast
+        message={toast.text}
+        tone={toast.tone}
+        onDismiss={() => setToast({ text: "", tone: "info" })}
+      />
+      <div className="account-section-head">
+        <div className="account-section-title-group">
+          <h2>{student ? `编辑${student.nickname}的档案` : "添加孩子档案"}</h2>
+          <InfoPopover label="填写说明" title="孩子档案填写与账号说明">
+            <p>出生年月、学年、省份、城市、学校和家长备注均为选填项。</p>
+            <p>
+              档案与学生独立登录账号分离；如需开通孩子独立登录账号，请联系管理员绑定。
+            </p>
+          </InfoPopover>
+        </div>
+      </div>
+
       <form onSubmit={submit}>
         <div className="account-grid">
           <Field label="昵称">
@@ -73,14 +121,18 @@ export function StudentForm({
               maxLength={80}
             />
           </Field>
-          <Field label="头像">
-            <select name="avatar" defaultValue={student?.avatar ?? "panda"}>
-              <option value="panda">🐼 熊猫</option>
-              <option value="fox">🦊 狐狸</option>
-              <option value="rabbit">🐰 兔子</option>
-              <option value="bear">🐻 小熊</option>
-            </select>
-          </Field>
+          <div className="account-field">
+            <span className="avatar-inline">
+              <Avatar id={avatar} />
+              头像（保存档案后生效）
+            </span>
+            <AvatarChoices
+              name="avatar"
+              value={avatar}
+              onChange={setAvatar}
+              disabled={busy || !!student?.archived_at}
+            />
+          </div>
           <Field label="出生年月（选填）">
             <input
               name="birth_month"
@@ -160,14 +212,17 @@ export function StudentForm({
             defaultValue={student?.parent_notes ?? ""}
           />
         </Field>
-        <Message text={error} />
         <div className="account-actions">
-          <button disabled={busy}>保存档案</button>
-          <button type="button" className="secondary" onClick={onCancel}>
-            取消
-          </button>
+          <button disabled={busy || !!student?.archived_at}>保存档案</button>
+          {onCancel ? (
+            <button type="button" className="secondary" onClick={onCancel}>
+              取消
+            </button>
+          ) : null}
         </div>
       </form>
-    </section>
+    </>
   );
+
+  return embedded ? <div>{content}</div> : <section className="account-card">{content}</section>;
 }

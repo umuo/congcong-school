@@ -66,7 +66,7 @@ export function TrueFalseQuestion({
         key={label}
         type="button"
         aria-pressed={selected}
-        disabled={phase === "checked"}
+        disabled={locked || phase === "checked"}
         onClick={() => select(label)}
         className={cn("flex-1 flex flex-col items-center gap-2 relative", cls)}
         style={{ minHeight: 108 }}
@@ -84,7 +84,7 @@ export function TrueFalseQuestion({
   };
 
   return (
-    <div className="w-full">
+    <div className="w-full" data-sound-handled>
       <QuestionPrompt text={question.question} audio={question.audio?.question} locked={locked} />
       <div className="flex gap-3">
         {renderBtn("对", <Check className="w-10 h-10 text-primary" />, "1")}

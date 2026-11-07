@@ -15,6 +15,7 @@ __pycache__/
 *$py.class
 *.egg-info/
 .venv/
+apps/api/.venv
 .venv-*/
 venv/
 env/
@@ -77,6 +78,8 @@ release-assets/
 
 # Local build verification and audio conversion cache
 deploy-output/
+.deployment/
+.asset-cache/
 
 # Generated private cloud question banks (never publish as static web assets)
 apps/api/private-content/

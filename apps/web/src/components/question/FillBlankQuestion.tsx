@@ -36,7 +36,7 @@ export function FillBlankQuestion({
   onChange,
   locked = false,
 }: QuestionRendererProps) {
-  const disabled = phase === "checked";
+  const disabled = locked || phase === "checked";
   const cancelNarrate = useAutoNarrate([question.audio?.question], question.id);
 
   function handleKey(k: string) {
@@ -77,7 +77,7 @@ export function FillBlankQuestion({
 
   let displayCls =
     "w-full min-h-[68px] text-3xl font-extrabold text-center px-4 py-4 rounded-2xl border-2 flex items-center justify-center";
-  if (disabled) {
+  if (phase === "checked" && isCorrect !== null) {
     displayCls = cn(
       displayCls,
       isCorrect
@@ -89,7 +89,7 @@ export function FillBlankQuestion({
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full" data-sound-handled>
       <QuestionPrompt text={question.question} audio={question.audio?.question} locked={locked} />
 
       <motion.div
@@ -105,7 +105,7 @@ export function FillBlankQuestion({
         )}
       </motion.div>
 
-      {phase === "checked" && !isCorrect && (
+      {phase === "checked" && isCorrect === false && (
         <motion.div
           initial={{ y: 6, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}

@@ -43,7 +43,7 @@ const EN_CONSONANTS = "bcdfghklmnprstwy";
 /** 根据答案生成候选字列表（答案字 + 干扰字，打散） */
 function buildCandidates(answerStr: string, questionId: number): string[] {
   // === 英文单词答案：干扰项用小写字母（元音/辅音合理配比），不混中文字 ===
-  if (/^[a-zA-Z][a-zA-Z\s'-]*$/.test(answerStr.trim())) {
+  if (/^[a-zA-Z][a-zA-Z\s'.,!?:;-]*$/.test(answerStr.trim())) {
     const answerChars = [
       ...new Set(answerStr.toLowerCase().replace(/[^a-z-]/g, "").split("")),
     ];
@@ -85,13 +85,14 @@ export function FillBlankTextQuestion({
   isCorrect,
   onChange,
   locked = false,
+  inputKeyboard,
 }: QuestionRendererProps) {
-  const disabled = phase === "checked";
+  const disabled = locked || phase === "checked";
   const cancelNarrate = useAutoNarrate([question.audio?.question], question.id);
 
   const candidates = useMemo(
-    () => buildCandidates(question.answer, question.id),
-    [question.answer, question.id],
+    () => inputKeyboard?.candidates ?? buildCandidates(question.answer, question.id),
+    [inputKeyboard, question.answer, question.id],
   );
 
   function handleKey(k: string) {
@@ -104,13 +105,13 @@ export function FillBlankTextQuestion({
       return;
     }
     // 限制长度，防止误操作
-    if (answer.length >= Math.max(10, question.answer.trim().length)) return;
+    if (answer.length >= (inputKeyboard?.max_length ?? Math.max(10, question.answer.trim().length))) return;
     onChange(answer + k);
   }
 
   let displayCls =
     "w-full min-h-[68px] text-3xl font-extrabold text-center px-4 py-4 rounded-2xl border-2 flex items-center justify-center";
-  if (disabled) {
+  if (phase === "checked" && isCorrect !== null) {
     displayCls = cn(
       displayCls,
       isCorrect
@@ -125,7 +126,7 @@ export function FillBlankTextQuestion({
   const cols = candidates.length <= 9 ? 3 : 4;
 
   return (
-    <div className="w-full">
+    <div className="w-full" data-sound-handled>
       <QuestionPrompt text={question.question} audio={question.audio?.question} locked={locked} />
 
       {/* 答案显示区 */}
@@ -135,10 +136,10 @@ export function FillBlankTextQuestion({
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: "spring", damping: 18, stiffness: 260 }}
       >
-        {answer ? <span className="min-w-0 break-all">{answer}</span> : <span className="text-ink-light text-xl font-bold">{/[a-zA-Z]/.test(question.answer) ? "点下方字母作答" : "点下方汉字作答"}</span>}
+        {answer ? <span className="min-w-0 break-all">{answer}</span> : <span className="text-ink-light text-xl font-bold">{(inputKeyboard ? inputKeyboard.language === "letters" : /[a-zA-Z]/.test(question.answer)) ? "点下方字母作答" : "点下方汉字作答"}</span>}
       </motion.div>
 
-      {phase === "checked" && !isCorrect && (
+      {phase === "checked" && isCorrect === false && (
         <motion.div
           initial={{ y: 6, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -160,13 +161,14 @@ export function FillBlankTextQuestion({
             type="button"
             disabled={disabled}
             onClick={() => handleKey(ch)}
+            aria-label={ch.trim() ? undefined : "空格"}
             className={cn(
               "ui-key h-14 rounded-2xl text-2xl font-extrabold bg-white border-2 border-bg-softer text-ink",
               "hover:border-secondary/60 active:translate-y-[2px] active:shadow-none disabled:opacity-50 disabled:cursor-not-allowed transition-colors",
             )}
             style={{ boxShadow: "0 3px 0 0 var(--shadow-card-color)" }}
           >
-            {ch}
+            {ch.trim() ? ch : "␣"}
           </motion.button>
         ))}
         {/* 退格键 */}

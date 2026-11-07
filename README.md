@@ -125,9 +125,9 @@
 
 三类账号登录、管理员开通账号和本地预览见 [家庭账号使用说明](docs/family-account-guide.md)。
 
-跨电脑继续开发请先读 [当前交接记录](docs/family-learning-handoff.md)（21/32 任务完成，包含未完成范围、环境与数据库版本）。
+跨电脑继续开发请先读 [当前交接记录](docs/family-learning-handoff.md)（31/32 任务完成；[隔离 HTTPS 测试站](https://study.lacknb.com:8443/login/)已使用 Caddy 部署，[交付验收报告](docs/family-cloud-acceptance.md)已完成；按用户决定，仅实体跟读录音保留待验收）。
 
-独立产物及启动命令见 [local/cloud 构建说明](docs/local-cloud-builds.md)，私有题库与学习 API 见 [内容服务](docs/cloud-content-service.md) 和 [学习会话契约](docs/cloud-learning-session-api.md)。云端儿童学习界面、奖励结算及完整部署仍按任务清单接入。
+独立产物及启动命令见 [local/cloud 构建说明](docs/local-cloud-builds.md)，私有题库与学习 API 见 [内容服务](docs/cloud-content-service.md)、[学习会话契约](docs/cloud-learning-session-api.md) 和 [学习客户端](docs/cloud-learning-client.md)。课程、复习、故事、听读、数感和奖励界面已接入；完整验收仍按任务清单推进。[家庭导入、导出与删除](docs/cloud-data-portability.md)及 [HTTPS 部署、备份与回滚](docs/cloud-deployment.md)分别说明数据边界和运维步骤。
 
 | 功能 | 说明 |
 |------|------|
@@ -258,15 +258,15 @@ xcodegen generate          # 生成 .xcodeproj
 open ChinaTextbookStudy.xcodeproj
 ```
 
-在 Xcode 里选 iPhone / iPad 模拟器，Cmd+R 即可运行。App 内置一本数学书（一年级上册 + 第一节课的 TTS 音频）作为离线种子，无需网络就能体验完整流程。
+在 Xcode 里选 iPhone / iPad 模拟器，Cmd+R 即可运行。当前 iOS 目标已改为云端测试版，使用系统 WKWebView 连接 `https://study.lacknb.com:8443/login/`，需要网络和管理员创建的账号。详见 [iOS 云端测试与打包](apps/mobile/CLOUD-TESTING.md)。
 
-**iOS 端特点：**
+**当前 iOS 测试包：**
 
-- SwiftUI 原生（非 React Native），支持 iPhone + iPad（iPad 自动分栏布局）
-- 域逻辑（SRS / 判分 / 成就 / 宝箱 / 吉祥物）从 `packages/core` 逐文件对译为 Swift
-- 音频：Opus 预转码为 AAC m4a，`AVAudioPlayer` 播放，无第三方解码依赖
-- 数据按书从 GitHub Release 按需下载，无需首启下载全部教材
-- 包含单元测试与 UI 测试（答题闭环、退出确认、标签导航、装扮购买、每日任务）
+- 支持 iOS/iPadOS 17+，使用系统 WebView 运行现有云端功能，不代表已完成原生 API 界面重写。
+- 复用服务端登录、学生范围、判分、奖励和原键同步，不内置密码或离线题库。
+- 支持系统麦克风提示、页面内跟读录音、文件选择与备份下载分享。
+- 可运行 `bash scripts/build-ios-cloud.sh` 生成未签名 IPA；需自行签名后安装。
+- 原离线 SwiftUI、领域逻辑及测试源码保留，未参与当前云端目标。下方设计系统说明是原生离线源码的说明。
 
 **统一设计系统（`DesignSystem/`）**
 

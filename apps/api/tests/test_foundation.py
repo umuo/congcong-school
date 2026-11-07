@@ -1,14 +1,15 @@
 import asyncio
-import os
-import subprocess
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import httpx
 import psycopg
 import pytest
+from alembic import command
 from alembic.config import Config
 from alembic.script import ScriptDirectory
 from pydantic import ValidationError
+from sqlalchemy import create_engine
 from sqlalchemy.engine import make_url
 
 from app.config import Settings
@@ -18,16 +19,19 @@ API_ROOT = Path(__file__).resolve().parents[1]
 
 
 def migrate(url: str, *args: str) -> None:
-    env = {**os.environ, "CSF_DATABASE_URL": url}
-    result = subprocess.run(
-        [str(API_ROOT / ".venv/bin/alembic"), *args],
-        cwd=API_ROOT,
-        env=env,
-        capture_output=True,
-        text=True,
-        timeout=90,
-    )
-    assert result.returncode == 0, result.stderr
+    def execute():
+        config = Config(API_ROOT / "alembic.ini")
+        engine = create_engine(url, hide_parameters=True, connect_args={"connect_timeout": 5})
+        try:
+            with engine.begin() as connection:
+                config.attributes["connection"] = connection
+                getattr(command, args[0])(config, *args[1:])
+        finally:
+            engine.dispose()
+
+    # 同一进程缓存模型导入；独立线程也兼容 async fixture 的事件循环。
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        pool.submit(execute).result(timeout=90)
 
 
 def test_settings_require_postgres():

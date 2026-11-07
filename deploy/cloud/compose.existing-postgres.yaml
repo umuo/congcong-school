@@ -1,0 +1,42 @@
+# Isolated host deployment reuses an explicitly selected loopback PostgreSQL DB.
+# No database ports or existing services are changed by this project.
+name: congcong-cloud-preview
+services:
+  api:
+    image: ${CSF_API_IMAGE:?Set an immutable API image tag}
+    build:
+      context: ../..
+      dockerfile: deploy/cloud/api.Dockerfile
+    network_mode: host
+    env_file: ${CSF_API_ENV_FILE:?Private runtime environment file}
+    environment:
+      CSF_CONTENT_ROOT: /content
+      CSF_DELETION_JOURNAL: /private/deletions.jsonl
+      CSF_COOKIE_SECURE: "true"
+    command: [/opt/venv/bin/uvicorn, "app.main:create_app", --factory, --host, "127.0.0.1", --port, "18010", --no-access-log]
+    volumes:
+      - ${CSF_CONTENT_ROOT:?Private content directory}/apps/web/public:/content/apps/web/public:ro
+      - ${CSF_PRIVATE_DIRECTORY:?Private journal directory}:/private
+    read_only: true
+    tmpfs: [/tmp]
+    restart: unless-stopped
+  web:
+    image: ${CSF_CADDY_IMAGE:-caddy:2}
+    network_mode: host
+    environment:
+      CSF_PUBLIC_HOST: ${CSF_PUBLIC_HOST:?Set the test hostname}
+      CSF_PUBLIC_ADDRESS: ${CSF_PUBLIC_ADDRESS:?Set hostname and HTTPS port}
+      CSF_HTTPS_PORT: ${CSF_HTTPS_PORT:-8443}
+      CSF_API_ADDRESS: "127.0.0.1:18010"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ${CSF_CLOUD_SITE:?Scanned cloud out directory}:/site:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    read_only: true
+    tmpfs: [/tmp]
+    depends_on: [api]
+    restart: unless-stopped
+volumes:
+  caddy-data:
+  caddy-config:

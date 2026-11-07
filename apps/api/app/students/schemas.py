@@ -4,12 +4,14 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
+from app.avatars.catalog import DEFAULT_AVATAR, AvatarID
+
 
 class StudentCreate(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     nickname: str = Field(min_length=1, max_length=80)
-    avatar: Literal["panda", "fox", "rabbit", "bear"] = "panda"
+    avatar: AvatarID = DEFAULT_AVATAR
     birth_month: str | None = Field(default=None, pattern=r"^\d{4}-(0[1-9]|1[0-2])$")
     province: str | None = Field(default=None, max_length=80)
     city: str | None = Field(default=None, max_length=80)
@@ -54,7 +56,7 @@ class StudentUpdate(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     nickname: str | None = Field(default=None, min_length=1, max_length=80)
-    avatar: Literal["panda", "fox", "rabbit", "bear"] | None = None
+    avatar: AvatarID | None = None
     birth_month: str | None = Field(default=None, pattern=r"^\d{4}-(0[1-9]|1[0-2])$")
     province: str | None = Field(default=None, max_length=80)
     city: str | None = Field(default=None, max_length=80)

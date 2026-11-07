@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Volume } from "@/components/icons";
-import { useProgressStore } from "@/store/progress";
+import { useAudioPreferences } from "@/lib/learning/preferences";
 import { QuestionPrompt } from "./QuestionPrompt";
 import { ChoiceQuestion } from "./ChoiceQuestion";
 import type { QuestionRendererProps } from "./QuestionRenderer";
@@ -205,7 +205,7 @@ export function NumberSenseQuestion(props: QuestionRendererProps) {
   const [localDraft, setLocalDraft] = useState<number[]>([]);
   const [localHint, setLocalHint] = useState(0);
   const [audioError, setAudioError] = useState(false);
-  const muted = useProgressStore((s) => s.muted);
+  const { muted } = useAudioPreferences();
   const marked = props.visualDraft ?? localDraft;
   const hint = props.hintLevel ?? localHint;
   useEffect(() => {
@@ -277,7 +277,7 @@ export function NumberSenseQuestion(props: QuestionRendererProps) {
           <button
             type="button"
             className="ui-text-button text-secondary-dark"
-            disabled={locked || hint >= task.hints.length}
+            disabled={locked || hint >= (props.hintLimit ?? task.hints.length)}
             onClick={() => {
               if (props.onHint) props.onHint();
               else setLocalHint((v) => v + 1);
@@ -286,7 +286,7 @@ export function NumberSenseQuestion(props: QuestionRendererProps) {
             {" "}
             {hint === 0
               ? "给我一点提示"
-              : hint < task.hints.length
+              : hint < (props.hintLimit ?? task.hints.length)
                 ? "再给我一点提示"
                 : "可以照着提示再试试"}
           </button>

@@ -32,10 +32,12 @@ export type PublicQuestion = QuestionRef & {
   knowledge_point: string;
   audio: { question: string | null; options: (string | null)[] | null } | null;
   numberTask: {
+    hint_count?: number;
     stage: "guided" | "independent" | "transfer";
     visual: Record<string, unknown>;
     hints: string[];
   } | null;
+  input_keyboard?: { candidates: string[]; language: "letters" | "text"; max_length: number } | null;
 };
 
 export type AnswerFeedback = {
@@ -47,6 +49,8 @@ export type AnswerFeedback = {
   explanation_audio: string | null;
   evidence_sentence_indices: number[];
   grading_rule_version: string;
+  submitted_answer?: string | null;
+  submitted_evidence_indices?: number[];
 };
 
 export type LearningSessionView = {
@@ -68,14 +72,17 @@ export type LearningSessionView = {
     target_unit: number | null;
     reading_kind: "listen" | "followup" | null;
     hint_levels: Record<string, number>;
+    matching_pairs?: Partial<Record<string, string>>;
     draft: {
       answer?: string;
       intro_page?: number;
       visual_draft?: number[];
+      evidence_sentence_indices?: number[];
     };
   };
   question: PublicQuestion | null;
   feedback: AnswerFeedback | null;
+  settlement?: Record<string, unknown> | null;
 };
 
 export type AnswerSubmission = {

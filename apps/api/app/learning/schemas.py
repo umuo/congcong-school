@@ -67,6 +67,20 @@ class DraftBody(RevisionBody):
     answer: str = Field(default="", max_length=10000)
     intro_page: int = Field(default=0, ge=0, le=100)
     visual_draft: list[int] = Field(default_factory=list, max_length=1000)
+    evidence_sentence_indices: list[int] = Field(default_factory=list, max_length=100)
+
+
+class MatchingPairBody(RevisionBody):
+    question_uid: str = Field(pattern=r"^[a-f0-9]{64}$")
+    question_version: str = Field(pattern=r"^[a-f0-9]{64}$")
+    left: Literal["A", "B", "C", "D"]
+    right: Literal["1", "2", "3", "4"]
+
+
+class InputKeyboard(StrictBody):
+    candidates: list[str]
+    language: Literal["letters", "text"]
+    max_length: int
 
 
 class PublicAudio(StrictBody):
@@ -78,6 +92,7 @@ class PublicNumberTask(StrictBody):
     stage: Literal["guided", "independent", "transfer"]
     visual: CountVisual | CompareVisual | ShareVisual
     hints: list[str] = Field(default_factory=list)
+    hint_count: int = Field(default=0, ge=0)
 
 
 class PublicQuestion(StrictBody):
@@ -92,6 +107,7 @@ class PublicQuestion(StrictBody):
     knowledge_point: str
     audio: PublicAudio | None = None
     numberTask: PublicNumberTask | None = None
+    input_keyboard: InputKeyboard | None = None
 
 
 class AnswerFeedback(StrictBody):
@@ -103,6 +119,8 @@ class AnswerFeedback(StrictBody):
     explanation_audio: str | None
     evidence_sentence_indices: list[int]
     grading_rule_version: str
+    submitted_answer: str | None = None
+    submitted_evidence_indices: list[int] = Field(default_factory=list)
 
 
 class SessionView(BaseModel):
@@ -118,10 +136,17 @@ class SessionView(BaseModel):
     checkpoint: dict
     question: PublicQuestion | None
     feedback: AnswerFeedback | None
+    settlement: dict | None = None
+
+
+class MatchingPairView(BaseModel):
+    correct: bool
+    session: SessionView
 
 
 class EconomyAction(StrictBody):
     kind: Literal[
+        "league",
         "daily_reward",
         "quest",
         "chest",

@@ -5,7 +5,8 @@
     "packages/core/src/cosmetics.ts": "31d38023b1a2053c575d1ce026d4d9908c4003a8f3b5299ac52ec3f634176366",
     "packages/core/src/achievements.ts": "053eab24c82985e228372884fd1f80ab614212f22e05171b42b16e0ec1219236",
     "packages/core/src/quests.ts": "501b71f40e1f6d10f011f7908c955c677e386fff8138191dc959dcc73096e308",
-    "packages/core/src/numberSense.ts": "de41d0f57f21591aa1bf818bba95f316865778eec0b881248fb6e1e8efa82973"
+    "packages/core/src/numberSense.ts": "de41d0f57f21591aa1bf818bba95f316865778eec0b881248fb6e1e8efa82973",
+    "packages/core/src/league.ts": "c0c8e7cb0dc7991f3c50d398b38cdabdbc76e49ff6d1261165f207a5eda4d934"
   },
   "constants": {
     "DAILY_GOAL_BONUS": 20,
@@ -681,5 +682,121 @@
       "goal": "给每个朋友分一个，判断够不够。"
     }
   },
-  "number_version": 1
+  "number_version": 1,
+  "league": {
+    "names": [
+      "小猴淘淘",
+      "兔子朵朵",
+      "熊猫团团",
+      "小鹿灵灵",
+      "狐狸悠悠",
+      "小象壮壮",
+      "企鹅冰冰",
+      "小猫咪咪",
+      "小狗旺旺",
+      "松鼠果果",
+      "小鸟啾啾",
+      "海豚蓝蓝",
+      "小马奔奔",
+      "刺猬球球",
+      "考拉抱抱",
+      "小龙腾腾",
+      "河马呼呼",
+      "小羊咩咩",
+      "青蛙呱呱",
+      "蜜蜂嗡嗡",
+      "猫头鹰慧慧",
+      "小熊憨憨",
+      "仓鼠豆豆",
+      "鹦鹉花花",
+      "小鲸鱼泡泡",
+      "蜗牛慢慢",
+      "小老虎威威",
+      "浣熊乐乐",
+      "长颈鹿高高",
+      "小恐龙吼吼",
+      "雪人白白",
+      "星星闪闪",
+      "月亮弯弯",
+      "太阳暖暖",
+      "彩虹七七",
+      "云朵飘飘"
+    ],
+    "ranges": {
+      "bronze": {
+        "min": 40,
+        "max": 260
+      },
+      "silver": {
+        "min": 80,
+        "max": 420
+      },
+      "gold": {
+        "min": 120,
+        "max": 600
+      },
+      "sapphire": {
+        "min": 160,
+        "max": 800
+      },
+      "ruby": {
+        "min": 200,
+        "max": 1000
+      },
+      "diamond": {
+        "min": 240,
+        "max": 1200
+      }
+    },
+    "tiers": [
+      {
+        "id": "bronze",
+        "name": "青铜联赛",
+        "order": 0,
+        "color": "#CD7F32"
+      },
+      {
+        "id": "silver",
+        "name": "白银联赛",
+        "order": 1,
+        "color": "#A8B8C8"
+      },
+      {
+        "id": "gold",
+        "name": "黄金联赛",
+        "order": 2,
+        "color": "#FFC800"
+      },
+      {
+        "id": "sapphire",
+        "name": "蓝宝石联赛",
+        "order": 3,
+        "color": "#1CB0F6"
+      },
+      {
+        "id": "ruby",
+        "name": "红宝石联赛",
+        "order": 4,
+        "color": "#E0115F"
+      },
+      {
+        "id": "diamond",
+        "name": "钻石联赛",
+        "order": 5,
+        "color": "#54D7EC"
+      }
+    ],
+    "unlock": 10,
+    "bot_count": 15,
+    "promote": 5,
+    "demote": 5,
+    "rank_rewards": {
+      "1": 100,
+      "2": 80,
+      "3": 60,
+      "4": 40,
+      "5": 40
+    },
+    "promotion_bonus": 20
+  }
 }
